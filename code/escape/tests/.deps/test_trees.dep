@@ -1,0 +1,4 @@
+test_trees.o .deps/test_trees.dep: test_trees.cpp ../Escape/GraphIO.h ../Escape/ErrorCode.h \
+ ../Escape/Graph.h ../Escape/EdgeHash.h ../Escape/Digraph.h \
+ ../Escape/Triadic.h ../Escape/FiveTrees.h ../Escape/FourVertex.h \
+ ../Escape/Utils.h

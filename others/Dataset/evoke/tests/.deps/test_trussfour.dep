@@ -1,0 +1,8 @@
+test_trussfour.o .deps/test_trussfour.dep: test_trussfour.cpp ../Escape/GraphIO.h \
+ ../Escape/ErrorCode.h ../Escape/Graph.h ../Escape/EdgeHash.h \
+ ../Escape/Digraph.h ../Escape/Triadic.h ../Escape/FourVertex.h \
+ ../Escape/Utils.h ../Escape/Conversion.h ../Escape/GetAllCounts.h \
+ ../Escape/FiveTrees.h ../Escape/FiveFromCycleClique.h \
+ ../Escape/FiveFromTriangles.h ../Escape/TriangleProgram.h \
+ ../Escape/Graph.h ../Escape/JointSort.h ../Escape/AlmostFiveClique.h \
+ ../Escape/FiveCycle.h ../Escape/WedgeCollisions.h

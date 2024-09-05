@@ -1,0 +1,2 @@
+TriangleProgram.o .deps/TriangleProgram.dep: TriangleProgram.cpp Escape/TriangleProgram.h \
+ Escape/Graph.h Escape/JointSort.h

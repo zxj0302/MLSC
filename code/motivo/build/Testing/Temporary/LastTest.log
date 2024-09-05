@@ -1,0 +1,833 @@
+Start testing: Sep 05 16:05 HKT
+----------------------------------------------------------
+1/30 Testing: build-graph
+1/30 Test: build-graph
+Command: "/workspace/code/motivo/build/bin/motivo-graph" "--input" "/workspace/code/motivo/graphs/test-graph.txt" "--output" "test-graph"
+Directory: tests
+"build-graph" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-graph. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"build-graph" end time: Sep 05 16:05 HKT
+"build-graph" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/30 Testing: motivo-tests
+2/30 Test: motivo-tests
+Command: "/workspace/code/motivo/build/tests/motivo-tests" "-tce=*slow"
+Directory: tests
+"motivo-tests" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+[doctest] doctest version is "2.2.1"
+[doctest] run with "--help" for options
+Compress ratio: 4399 / 1048576 = 0.00419521
+Compress speed: 5785.7MiB/s
+Decompress speed: 1424.98MiB/s
+Compress ratio: 10536014 / 10485000 = 1.00487
+Compress speed: 1451.44MiB/s
+Decompress speed: 14109.5MiB/s
+===============================================================================
+[doctest] test cases:      8 |      8 passed |      0 failed |      4 skipped
+[doctest] assertions:   2172 |   2172 passed |      0 failed |
+[doctest] Status: SUCCESS!
+<end of output>
+Test time =   0.64 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-tests" end time: Sep 05 16:05 HKT
+"motivo-tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/30 Testing: motivo-build-1
+3/30 Test: motivo-build-1
+Command: "/workspace/code/motivo/build/bin/motivo-build" "-g" "test-graph" "-s" "1" "-c" "5" "-o" "test" "--seed" "42"
+Directory: tests
+"motivo-build-1" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-build. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Loaded graph with 60 vertices and 159 edges
+Computing counts of treelets of size 1 for vertices 0--59 using 1 thread(s)
+Building time: 2.935e-06 s
+Output written to test.1.cnt
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-build-1" end time: Sep 05 16:05 HKT
+"motivo-build-1" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/30 Testing: motivo-merge-1
+4/30 Test: motivo-merge-1
+Command: "/workspace/code/motivo/build/bin/motivo-merge" "-o" "test.1" "test.1.cnt"
+Directory: tests
+"motivo-merge-1" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-merge. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Compress threshold is: 0
+Loaded offsets for file test.1.cnt
+Writing output
+Compressed size: 3014 Original size: 2640 Ratio: 1.14167
+Building root sampler alias table... done
+Processed 60 vertices (wrote 60 counts)
+Total number of treelet occurrences: 60 (6 bits)
+Maximum number of occurrences rooted in a single vertex: 1 (1 bits)
+Maximum number of occurrences of a single rooted treelet: 1 (1 bits)
+Output written to files: test.1.dtz, and test.1.rts
+Merge time: 0.000286543 s
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-merge-1" end time: Sep 05 16:05 HKT
+"motivo-merge-1" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/30 Testing: motivo-build-2
+5/30 Test: motivo-build-2
+Command: "/workspace/code/motivo/build/bin/motivo-build" "-g" "test-graph" "-s" "2" "-i" "test" "-o" "test"
+Directory: tests
+"motivo-build-2" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-build. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Loaded graph with 60 vertices and 159 edges
+Loading tables for smaller sizes
+Computing counts of treelets of size 2 for vertices 0--59 using 1 thread(s)
+Building time: 2.301e-05 s
+Output written to test.2.cnt
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-build-2" end time: Sep 05 16:05 HKT
+"motivo-build-2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/30 Testing: motivo-merge-2
+6/30 Test: motivo-merge-2
+Command: "/workspace/code/motivo/build/bin/motivo-merge" "-o" "test.2" "test.2.cnt"
+Directory: tests
+"motivo-merge-2" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-merge. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Compress threshold is: 0
+Loaded offsets for file test.2.cnt
+Writing output
+Compressed size: 4224 Original size: 3850 Ratio: 1.09714
+Building root sampler alias table... done
+Processed 60 vertices (wrote 115 counts)
+Total number of treelet occurrences: 266 (9 bits)
+Maximum number of occurrences rooted in a single vertex: 14 (4 bits)
+Maximum number of occurrences of a single rooted treelet: 6 (3 bits)
+Output written to files: test.2.dtz, and test.2.rts
+Merge time: 9.4594e-05 s
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-merge-2" end time: Sep 05 16:05 HKT
+"motivo-merge-2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/30 Testing: motivo-build-3
+7/30 Test: motivo-build-3
+Command: "/workspace/code/motivo/build/bin/motivo-build" "-g" "test-graph" "-s" "3" "-i" "test" "-o" "test"
+Directory: tests
+"motivo-build-3" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-build. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Loaded graph with 60 vertices and 159 edges
+Loading tables for smaller sizes
+Computing counts of treelets of size 3 for vertices 0--59 using 1 thread(s)
+Building time: 9.4601e-05 s
+Output written to test.3.cnt
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-build-3" end time: Sep 05 16:05 HKT
+"motivo-build-3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/30 Testing: motivo-merge-3
+8/30 Test: motivo-merge-3
+Command: "/workspace/code/motivo/build/bin/motivo-merge" "-o" "test.3" "test.3.cnt"
+Directory: tests
+"motivo-merge-3" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-merge. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Compress threshold is: 0
+Loaded offsets for file test.3.cnt
+Writing output
+Compressed size: 7524 Original size: 7150 Ratio: 1.05231
+Building root sampler alias table... done
+Processed 60 vertices (wrote 265 counts)
+Total number of treelet occurrences: 2865 (12 bits)
+Maximum number of occurrences rooted in a single vertex: 213 (8 bits)
+Maximum number of occurrences of a single rooted treelet: 40 (6 bits)
+Output written to files: test.3.dtz, and test.3.rts
+Merge time: 9.1977e-05 s
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-merge-3" end time: Sep 05 16:05 HKT
+"motivo-merge-3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/30 Testing: motivo-build-4
+9/30 Test: motivo-build-4
+Command: "/workspace/code/motivo/build/bin/motivo-build" "-g" "test-graph" "-s" "4" "-i" "test" "-o" "test"
+Directory: tests
+"motivo-build-4" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-build. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Loaded graph with 60 vertices and 159 edges
+Loading tables for smaller sizes
+Computing counts of treelets of size 4 for vertices 0--59 using 1 thread(s)
+Building time: 0.000183103 s
+Output written to test.4.cnt
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-build-4" end time: Sep 05 16:05 HKT
+"motivo-build-4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/30 Testing: motivo-merge-4
+10/30 Test: motivo-merge-4
+Command: "/workspace/code/motivo/build/bin/motivo-merge" "-o" "test.4" "test.4.cnt"
+Directory: tests
+"motivo-merge-4" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-merge. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Compress threshold is: 0
+Loaded offsets for file test.4.cnt
+Writing output
+Compressed size: 8426 Original size: 8052 Ratio: 1.04645
+Building root sampler alias table... done
+Processed 60 vertices (wrote 306 counts)
+Total number of treelet occurrences: 27768 (15 bits)
+Maximum number of occurrences rooted in a single vertex: 2464 (12 bits)
+Maximum number of occurrences of a single rooted treelet: 360 (9 bits)
+Output written to files: test.4.dtz, and test.4.rts
+Merge time: 9.4664e-05 s
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-merge-4" end time: Sep 05 16:05 HKT
+"motivo-merge-4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/30 Testing: motivo-build-5
+11/30 Test: motivo-build-5
+Command: "/workspace/code/motivo/build/bin/motivo-build" "-g" "test-graph" "-s" "5" "-i" "test" "-o" "test"
+Directory: tests
+"motivo-build-5" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-build. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Loaded graph with 60 vertices and 159 edges
+Loading tables for smaller sizes
+Computing counts of treelets of size 5 for vertices 0--59 using 1 thread(s)
+Building time: 0.00036114 s
+Output written to test.5.cnt
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-build-5" end time: Sep 05 16:05 HKT
+"motivo-build-5" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/30 Testing: motivo-merge-5
+12/30 Test: motivo-merge-5
+Command: "/workspace/code/motivo/build/bin/motivo-merge" "-o" "test.5" "test.5.cnt"
+Directory: tests
+"motivo-merge-5" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-merge. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Compress threshold is: 0
+Loaded offsets for file test.5.cnt
+Writing output
+Compressed size: 5170 Original size: 4796 Ratio: 1.07798
+Building root sampler alias table... done
+Processed 60 vertices (wrote 158 counts)
+Total number of treelet occurrences: 150240 (18 bits)
+Maximum number of occurrences rooted in a single vertex: 15000 (14 bits)
+Maximum number of occurrences of a single rooted treelet: 2880 (12 bits)
+Output written to files: test.5.dtz, and test.5.rts
+Merge time: 8.593e-05 s
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-merge-5" end time: Sep 05 16:05 HKT
+"motivo-merge-5" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/30 Testing: motivo-build-mt-1
+13/30 Test: motivo-build-mt-1
+Command: "/workspace/code/motivo/build/bin/motivo-build" "-g" "test-graph" "-s" "1" "-c" "5" "-o" "test-mt" "--seed" "42"
+Directory: tests
+"motivo-build-mt-1" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-build. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Loaded graph with 60 vertices and 159 edges
+Computing counts of treelets of size 1 for vertices 0--59 using 1 thread(s)
+Building time: 2.988e-06 s
+Output written to test-mt.1.cnt
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-build-mt-1" end time: Sep 05 16:05 HKT
+"motivo-build-mt-1" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/30 Testing: motivo-merge-mt-1
+14/30 Test: motivo-merge-mt-1
+Command: "/workspace/code/motivo/build/bin/motivo-merge" "-o" "test-mt.1" "test.1.cnt"
+Directory: tests
+"motivo-merge-mt-1" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-merge. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Compress threshold is: 0
+Loaded offsets for file test.1.cnt
+Writing output
+Compressed size: 3014 Original size: 2640 Ratio: 1.14167
+Building root sampler alias table... done
+Processed 60 vertices (wrote 60 counts)
+Total number of treelet occurrences: 60 (6 bits)
+Maximum number of occurrences rooted in a single vertex: 1 (1 bits)
+Maximum number of occurrences of a single rooted treelet: 1 (1 bits)
+Output written to files: test-mt.1.dtz, and test-mt.1.rts
+Merge time: 8.702e-05 s
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-merge-mt-1" end time: Sep 05 16:05 HKT
+"motivo-merge-mt-1" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/30 Testing: motivo-build-mt-2
+15/30 Test: motivo-build-mt-2
+Command: "/workspace/code/motivo/build/bin/motivo-build" "-g" "test-graph" "-s" "2" "-i" "test-mt" "-o" "test-mt" "--threads" "0"
+Directory: tests
+"motivo-build-mt-2" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-build. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Loaded graph with 60 vertices and 159 edges
+Loading tables for smaller sizes
+Computing counts of treelets of size 2 for vertices 0--59 using 32 thread(s)
+Building time: 0.000861942 s
+Output written to test-mt.2.cnt
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-build-mt-2" end time: Sep 05 16:05 HKT
+"motivo-build-mt-2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/30 Testing: motivo-merge-mt-2
+16/30 Test: motivo-merge-mt-2
+Command: "/workspace/code/motivo/build/bin/motivo-merge" "-o" "test-mt.2" "test-mt.2.cnt"
+Directory: tests
+"motivo-merge-mt-2" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-merge. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Compress threshold is: 0
+Loaded offsets for file test-mt.2.cnt
+Writing output
+Compressed size: 4224 Original size: 3850 Ratio: 1.09714
+Building root sampler alias table... done
+Processed 60 vertices (wrote 115 counts)
+Total number of treelet occurrences: 266 (9 bits)
+Maximum number of occurrences rooted in a single vertex: 14 (4 bits)
+Maximum number of occurrences of a single rooted treelet: 6 (3 bits)
+Output written to files: test-mt.2.dtz, and test-mt.2.rts
+Merge time: 8.8109e-05 s
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-merge-mt-2" end time: Sep 05 16:05 HKT
+"motivo-merge-mt-2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/30 Testing: motivo-dtz-mt-matches-st-2
+17/30 Test: motivo-dtz-mt-matches-st-2
+Command: "/usr/bin/cmake" "-E" "compare_files" "test-mt.2.dtz" "test.2.dtz"
+Directory: tests
+"motivo-dtz-mt-matches-st-2" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-dtz-mt-matches-st-2" end time: Sep 05 16:05 HKT
+"motivo-dtz-mt-matches-st-2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/30 Testing: motivo-rts-mt-matches-st-2
+18/30 Test: motivo-rts-mt-matches-st-2
+Command: "/usr/bin/cmake" "-E" "compare_files" "test-mt.2.rts" "test.2.rts"
+Directory: tests
+"motivo-rts-mt-matches-st-2" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-rts-mt-matches-st-2" end time: Sep 05 16:05 HKT
+"motivo-rts-mt-matches-st-2" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/30 Testing: motivo-build-mt-3
+19/30 Test: motivo-build-mt-3
+Command: "/workspace/code/motivo/build/bin/motivo-build" "-g" "test-graph" "-s" "3" "-i" "test-mt" "-o" "test-mt" "--threads" "0"
+Directory: tests
+"motivo-build-mt-3" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-build. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Loaded graph with 60 vertices and 159 edges
+Loading tables for smaller sizes
+Computing counts of treelets of size 3 for vertices 0--59 using 32 thread(s)
+Building time: 0.00112604 s
+Output written to test-mt.3.cnt
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-build-mt-3" end time: Sep 05 16:05 HKT
+"motivo-build-mt-3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/30 Testing: motivo-merge-mt-3
+20/30 Test: motivo-merge-mt-3
+Command: "/workspace/code/motivo/build/bin/motivo-merge" "-o" "test-mt.3" "test-mt.3.cnt"
+Directory: tests
+"motivo-merge-mt-3" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-merge. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Compress threshold is: 0
+Loaded offsets for file test-mt.3.cnt
+Writing output
+Compressed size: 7524 Original size: 7150 Ratio: 1.05231
+Building root sampler alias table... done
+Processed 60 vertices (wrote 265 counts)
+Total number of treelet occurrences: 2865 (12 bits)
+Maximum number of occurrences rooted in a single vertex: 213 (8 bits)
+Maximum number of occurrences of a single rooted treelet: 40 (6 bits)
+Output written to files: test-mt.3.dtz, and test-mt.3.rts
+Merge time: 0.000141056 s
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-merge-mt-3" end time: Sep 05 16:05 HKT
+"motivo-merge-mt-3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/30 Testing: motivo-dtz-mt-matches-st-3
+21/30 Test: motivo-dtz-mt-matches-st-3
+Command: "/usr/bin/cmake" "-E" "compare_files" "test-mt.3.dtz" "test.3.dtz"
+Directory: tests
+"motivo-dtz-mt-matches-st-3" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-dtz-mt-matches-st-3" end time: Sep 05 16:05 HKT
+"motivo-dtz-mt-matches-st-3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/30 Testing: motivo-rts-mt-matches-st-3
+22/30 Test: motivo-rts-mt-matches-st-3
+Command: "/usr/bin/cmake" "-E" "compare_files" "test-mt.3.rts" "test.3.rts"
+Directory: tests
+"motivo-rts-mt-matches-st-3" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-rts-mt-matches-st-3" end time: Sep 05 16:05 HKT
+"motivo-rts-mt-matches-st-3" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/30 Testing: motivo-build-mt-4
+23/30 Test: motivo-build-mt-4
+Command: "/workspace/code/motivo/build/bin/motivo-build" "-g" "test-graph" "-s" "4" "-i" "test-mt" "-o" "test-mt" "--threads" "0"
+Directory: tests
+"motivo-build-mt-4" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-build. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Loaded graph with 60 vertices and 159 edges
+Loading tables for smaller sizes
+Computing counts of treelets of size 4 for vertices 0--59 using 32 thread(s)
+Building time: 0.00144613 s
+Output written to test-mt.4.cnt
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-build-mt-4" end time: Sep 05 16:05 HKT
+"motivo-build-mt-4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/30 Testing: motivo-merge-mt-4
+24/30 Test: motivo-merge-mt-4
+Command: "/workspace/code/motivo/build/bin/motivo-merge" "-o" "test-mt.4" "test-mt.4.cnt"
+Directory: tests
+"motivo-merge-mt-4" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-merge. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Compress threshold is: 0
+Loaded offsets for file test-mt.4.cnt
+Writing output
+Compressed size: 8426 Original size: 8052 Ratio: 1.04645
+Building root sampler alias table... done
+Processed 60 vertices (wrote 306 counts)
+Total number of treelet occurrences: 27768 (15 bits)
+Maximum number of occurrences rooted in a single vertex: 2464 (12 bits)
+Maximum number of occurrences of a single rooted treelet: 360 (9 bits)
+Output written to files: test-mt.4.dtz, and test-mt.4.rts
+Merge time: 0.000257452 s
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-merge-mt-4" end time: Sep 05 16:05 HKT
+"motivo-merge-mt-4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/30 Testing: motivo-dtz-mt-matches-st-4
+25/30 Test: motivo-dtz-mt-matches-st-4
+Command: "/usr/bin/cmake" "-E" "compare_files" "test-mt.4.dtz" "test.4.dtz"
+Directory: tests
+"motivo-dtz-mt-matches-st-4" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-dtz-mt-matches-st-4" end time: Sep 05 16:05 HKT
+"motivo-dtz-mt-matches-st-4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/30 Testing: motivo-rts-mt-matches-st-4
+26/30 Test: motivo-rts-mt-matches-st-4
+Command: "/usr/bin/cmake" "-E" "compare_files" "test-mt.4.rts" "test.4.rts"
+Directory: tests
+"motivo-rts-mt-matches-st-4" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-rts-mt-matches-st-4" end time: Sep 05 16:05 HKT
+"motivo-rts-mt-matches-st-4" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/30 Testing: motivo-build-mt-5
+27/30 Test: motivo-build-mt-5
+Command: "/workspace/code/motivo/build/bin/motivo-build" "-g" "test-graph" "-s" "5" "-i" "test-mt" "-o" "test-mt" "--threads" "0"
+Directory: tests
+"motivo-build-mt-5" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-build. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Loaded graph with 60 vertices and 159 edges
+Loading tables for smaller sizes
+Computing counts of treelets of size 5 for vertices 0--59 using 32 thread(s)
+Building time: 0.00185336 s
+Output written to test-mt.5.cnt
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-build-mt-5" end time: Sep 05 16:05 HKT
+"motivo-build-mt-5" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/30 Testing: motivo-merge-mt-5
+28/30 Test: motivo-merge-mt-5
+Command: "/workspace/code/motivo/build/bin/motivo-merge" "-o" "test-mt.5" "test-mt.5.cnt"
+Directory: tests
+"motivo-merge-mt-5" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+This is motivo-merge. Version: 0.1.1 (unknown RelWithDebInfo ea om MA dh sf OS al)
+Copyright (c) 2017-2019 Stefano Leucci and Marco Bressan
+Distributed under the MIT Software License 
+
+If you publish results based on Motivo, please acknowledge us by citing:
+M. Bressan, S. Leucci, A. Panconesi.
+Motivo: fast motif counting via succinct color coding and adaptive sampling.
+PVLDB, 12(11):1651-1663, 2019.
+DOI: https://doi.org/10.14778/3342263.3342640
+
+Compress threshold is: 0
+Loaded offsets for file test-mt.5.cnt
+Writing output
+Compressed size: 5170 Original size: 4796 Ratio: 1.07798
+Building root sampler alias table... done
+Processed 60 vertices (wrote 158 counts)
+Total number of treelet occurrences: 150240 (18 bits)
+Maximum number of occurrences rooted in a single vertex: 15000 (14 bits)
+Maximum number of occurrences of a single rooted treelet: 2880 (12 bits)
+Output written to files: test-mt.5.dtz, and test-mt.5.rts
+Merge time: 0.000337368 s
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-merge-mt-5" end time: Sep 05 16:05 HKT
+"motivo-merge-mt-5" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/30 Testing: motivo-dtz-mt-matches-st-5
+29/30 Test: motivo-dtz-mt-matches-st-5
+Command: "/usr/bin/cmake" "-E" "compare_files" "test-mt.5.dtz" "test.5.dtz"
+Directory: tests
+"motivo-dtz-mt-matches-st-5" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-dtz-mt-matches-st-5" end time: Sep 05 16:05 HKT
+"motivo-dtz-mt-matches-st-5" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/30 Testing: motivo-rts-mt-matches-st-5
+30/30 Test: motivo-rts-mt-matches-st-5
+Command: "/usr/bin/cmake" "-E" "compare_files" "test-mt.5.rts" "test.5.rts"
+Directory: tests
+"motivo-rts-mt-matches-st-5" start time: Sep 05 16:05 HKT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"motivo-rts-mt-matches-st-5" end time: Sep 05 16:05 HKT
+"motivo-rts-mt-matches-st-5" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 05 16:05 HKT

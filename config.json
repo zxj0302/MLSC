@@ -1,0 +1,132 @@
+{
+    "sample_config": {
+        "db_path": "input/rwd.db",
+        "save_path": null,
+        "constraints": {
+            "Set_1": {
+                "num_nodes": {"min": 0, "max": 200},
+                "degree_avg": {"max": 3},
+                "degree_max": {"max": 20},
+                "random_seed": 0,
+                "limit": 600
+            },
+            "Set_2": {
+                "num_nodes": {"min": 0, "max": 200},
+                "degree_avg": {"min": 3, "max": 10},
+                "degree_max": {"min": 10, "max": 50},
+                "random_seed": 0,
+                "limit": 600
+            },
+            "Set_3": {
+                "num_nodes": {"min": 200, "max": 500},
+                "degree_avg": {"max": 3},
+                "degree_max": {"max": 50},
+                "random_seed": 0,
+                "limit": 300
+            },
+            "Set_4": {
+                "num_nodes": {"min": 200, "max": 500},
+                "degree_avg": {"min": 3, "max": 10},
+                "degree_max": {"min": 50, "max": 100},
+                "random_seed": 0,
+                "limit": 300
+            }
+        },
+        "split_ratio": "4:1:1",
+        "output_folder": "input"
+    },
+    "plots_path": {
+        "root_folder": "plots",
+        "samples_analysis": "input",
+        "prediction_analysis": "output"
+    },
+    "algorithms": [
+        {
+            "name": "DeSCo",
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:DeSCo_LINUX",
+                "name": "DeSCo_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "/home/zxj/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15",
+                "device_requests": [{"Driver": "", "Count": -1, "DeviceIDs": null, "Capabilities": [["gpu"]], "Options": null}]
+            },
+            "command": [
+                "docker", "exec", "-it", "DeSCo_EXP", "bash", "-ilc", "cd /workspace/code/DeSCo && conda activate DeSCo && python desco_run.py /workspace/input /workspace/output"
+            ]
+        },
+        {
+            "name": "ESCAPE",
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:BASIC",
+                "name": "ESCAPE_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "/home/zxj/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15"
+            },
+            "command": [
+                "docker", "exec", "-it", "ESCAPE_EXP", "bash", "-ilc", "cd /workspace/code/escape && python escape_run.py /workspace/input /workspace/output"
+            ]
+        },
+        {
+            "name": "EVOKE",
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:BASIC",
+                "name": "EVOKE_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "/home/zxj/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15"
+            },
+            "command": [
+                "docker", "exec", "-it", "EVOKE_EXP", "bash", "-ilc", "cd /workspace/code/evoke && python evoke_run.py /workspace/input /workspace/output"
+            ]
+        },
+        {
+            "name": "MOTIVO",
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:MOTIVO",
+                "name": "MOTIVO_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "/home/zxj/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15"
+            },
+            "command": [
+                "docker", "exec", "-it", "MOTIVO_EXP", "bash", "-ilc", "cd /workspace/code/motivo && python motivo_run.py /workspace/input /workspace/output"
+            ]
+        },
+        {
+            "name": "ESC-GNN",
+            "container_config": {}
+        },
+        {
+            "name": "I2GNN",
+            "container_config": {}
+        }
+    ],
+    "execution_control": {
+    "sample_oracle": false,
+    "plot_sampled": false,
+    "run_experiments": true,
+    "plot_results": false
+    }    
+}

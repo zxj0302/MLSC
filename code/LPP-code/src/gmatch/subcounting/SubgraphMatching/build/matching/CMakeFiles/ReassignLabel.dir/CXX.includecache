@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/matching/ReassignLabel.cpp
+cassert
+-
+algorithm
+-
+vector
+-
+fstream
+-
+iostream
+-
+sstream
+-
+chrono
+-
+tuple
+-
+random
+-
+

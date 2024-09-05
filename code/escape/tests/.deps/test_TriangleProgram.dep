@@ -1,0 +1,4 @@
+test_TriangleProgram.o .deps/test_TriangleProgram.dep: test_TriangleProgram.cpp ../Escape/GraphIO.h \
+ ../Escape/ErrorCode.h ../Escape/Graph.h ../Escape/TriangleProgram.h \
+ ../Escape/Graph.h ../Escape/JointSort.h ../Escape/Digraph.h \
+ ../Escape/Triadic.h

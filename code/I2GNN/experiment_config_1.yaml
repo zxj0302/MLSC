@@ -1,0 +1,23 @@
+batch_size:
+  - 256
+target:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 7
+model:
+  - I2GNN
+  - GNN
+  - PPGN
+h:
+  - 3
+dataset:
+  - gtemp
+seed:
+  - 1
+epoch:
+  - 2000

@@ -1,0 +1,4 @@
+test_fivecycle.o .deps/test_fivecycle.dep: test_fivecycle.cpp ../Escape/GraphIO.h \
+ ../Escape/ErrorCode.h ../Escape/Graph.h ../Escape/EdgeHash.h \
+ ../Escape/Digraph.h ../Escape/Triadic.h ../Escape/FourVertex.h \
+ ../Escape/Utils.h ../Escape/FiveFromCycleClique.h ../Escape/FiveCycle.h

@@ -1,0 +1,18 @@
+Sept 20, 2019
+
+In function initfourCycleBasedCounter in Escape/FiveFromCycleClique.h, there was an array being allowed
+of size gout->nEdges, instead of gout->nVertices (lines 41, 42). This is a problem in graphs where nEdges < nVertices, leading
+to memory issues. This was pointed out by user Beatrice through a bug report.
+
+---------------------------------------
+
+Dec 22, 2022
+
+Fixed common.mk to link using libc++ instead of libstdc++. The makefile will now work with clang.
+
+--------------------------------------
+
+Jan 31, 2024
+
+Updated README to emphasize that the input Escape format should have an undirected edge given exactly once.
+

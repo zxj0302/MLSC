@@ -1,0 +1,15 @@
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/CMakeFiles/rebuild_cache.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/CMakeFiles/edit_cache.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/graph/CMakeFiles/rebuild_cache.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/graph/CMakeFiles/edit_cache.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/graph/CMakeFiles/graph.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/matching/CMakeFiles/edit_cache.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/matching/CMakeFiles/rebuild_cache.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/matching/CMakeFiles/SelectEdge.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/matching/CMakeFiles/ReassignLabel.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/matching/CMakeFiles/EdgeListConverter.out.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/matching/CMakeFiles/GraphConverter.out.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/matching/CMakeFiles/SubgraphMatching.out.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/utility/CMakeFiles/rebuild_cache.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/utility/CMakeFiles/edit_cache.dir
+/workspace/LPP-code/src/gmatch/subcounting/SubgraphMatching/build/utility/CMakeFiles/utility.dir

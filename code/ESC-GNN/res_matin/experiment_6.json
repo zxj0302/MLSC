@@ -1,0 +1,11 @@
+{
+  "command": "python run_graphcount.py --batch_size 128 --target 5 --model NestedGIN_eff --h 3 --lr 1e-2 --layers 3 --dataset gtemp",
+  "stdout": "",
+  "stderr": "",
+  "return_code": 0,
+  "time_taken": 82.03820061683655,
+  "user_time": 80.73105700000002,
+  "system_time": 1.4928450000000026,
+  "max_memory": 5128164,
+  "date": "2024-08-13 20:08:17"
+}

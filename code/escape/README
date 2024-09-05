@@ -1,0 +1,111 @@
+README for Escape
+----------------------------------
+
+Instructions:
+
+1) Run "make" in main directory.
+2) Go to wrappers/ directory. Run command:
+    python3 subgraph_counts.py <PATH TO INPUT> <DESIRED PATTERN SIZE> <OPTIONAL FLAGS>
+
+   DESIRED PATTERN SIZE: Either 3, 4, or 5
+   OPTIONAL FLAGS:
+           -i: output counts as integers. Useful for small graphs, or for debugging
+(For example, python3 subgraph_counts.py ../graphs/ca-AstroPh.edges 4 -i)
+
+  
+Input file must be in escape format, where first line has number 
+of nodes and edges, and every line has a distinct undirected edge. 
+Each undirected edge should appear only once.
+
+The console output gives the various numbers of patterns.
+Each line has a different count in the format: pattern name, number of non-induced counts, number of induced counts, ratio of induced to non-induced.
+
+The ordering of the output for 5-vertex patterns is identical to that given in the figure 5-vertex.png.
+
+-----------------------------------
+Here are instructions to convert a raw list of edges (with potential repeats) to the escape format. Any line beginning with a '#' is considered a comment, and ignored. A line with an edge is assumed to be pair of strings, indicating the ids of the vertices forming that edge.
+
+1) Go to directory python/
+2) Run "python sanitize.py <DIR NAME> <EDGE FILE NAME>
+       (eg python sanitize.py ../graphs ca-AstroPh.txt)
+
+This will create a .edges file in the directory. Such a file will be in escape format.
+
+-----------------------------------
+
+graphs/ :
+
+The graphs/ directory has a few raw input files. There
+is also a small test graph called small-test.txt. Remember to sanitize these by calling "sanitize.py"
+to convert into the escape format.
+
+-----------------------------------
+
+escape/ :
+
+This directory has the main graph manipulation and pattern counting codes.
+
+-----------------------------------
+
+exe/ :
+
+This directory has the main escape executables. There are some executables not part of the main subgraph counting routines, but you might find useful.
+
+
+-----------------------------------
+ccperdeg.cpp: The corresponding executable (ccperdeg) computes the list of clustering coefficients per degree, and outputs them into a file.
+USAGE: ./ccperdeg <INPUT FILE> <OUTPUT FILE>
+
+   <INPUT FILE>: This is file with graph in Escape format.
+   <OUTPUT FILE>: File where output is given.
+
+   Each line of the output file will have 
+        <degree> <average cc for degree> <number of vertices of degree>
+   with a line for every degree for which the count is non-zero.
+
+
+dagdegdists.cpp. The corresponding executable (dagdegdists) outputs the degree distributions of the degeneracy and degree ordered DAGS.
+It is basically a wrapper, that calls the appropriate functions in Digraph.h
+USAGE:
+        ./dagdegdists <INPUT FILE> <OUTPUT FILE>
+
+   <INPUT FILE>: This is file with graph in Escape format.
+   <OUTPUT FILE>: File where output is given.
+
+   The output file has two parts. The first part has the heading "Degree ordered".
+   The following lines give the out and in-degree distributions of the degree ordered DAG.
+   Each line of the output file will have
+        <degree> <number of vertices of this outdegree> <number of vertices of this indegree>
+   with a line for every degree for which one of these counts is non-zero.
+
+   The second part has the heading "Degeneracy ordered", and has the same information
+   for the degeneracy ordered DAG.
+
+
+count_closures.cpp: This was a script used to generate data for the paper "Finding Cliques in Social Networks: A New Distribution-Free Model
+", by Jacob Fox, Tim Roughgarden, C. Seshadhri, Fan Wei, Nicole Wein (ICALP 2018). It generates the triangle "closure" information,
+as defined in that paper.
+
+./count_closures <PATH FOR GRAPH>
+
+It generates file out.txt in the following format. 
+the first line is: n m
+Every subsequent line has three numbers: i num_pairs num_closed
+
+This means that there are num_pairs pairs of vertices with exactly i vertices in
+common, and num_closed of them are closed (have an edge)
+
+
+
+-----------------------------------
+
+wrappers/ :
+
+This directory has python wrapper functions through which the main code is called.
+
+-----------------------------------
+
+tests/ :
+
+This directory has various test scripts, used for debugging and timing.
+

@@ -1,0 +1,10 @@
+{
+  "command": "python run_count.py --batch_size 256 --target 2 --model NGNN --h 3 --seed 1 --epoch 2000 --dataset easy-1",
+  "log_file": "logs/easy-1/easy-1_t2_20240814202644.log",
+  "return_code": 0,
+  "time_taken": 53.5267276763916,
+  "user_time": 52.107561999999234,
+  "system_time": 1.5789660000000083,
+  "max_memory": 5146580,
+  "date": "2024-08-14 20:27:37"
+}

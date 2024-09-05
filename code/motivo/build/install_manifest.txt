@@ -1,0 +1,6 @@
+/usr/local/bin/motivo-build
+/usr/local/bin/motivo-merge
+/usr/local/bin/motivo-sample
+/usr/local/bin/motivo-graph
+/usr/local/bin/motivo-decompose
+/usr/local/bin/motivo-homomorphism

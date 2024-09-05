@@ -1,0 +1,5 @@
+Metadata-Version: 2.1
+Name: Gmatch
+Version: 0.1
+Summary: Code for the subgraph mathcing/containment decision, using NN approachs
+License: MIT

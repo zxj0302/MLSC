@@ -1,0 +1,2 @@
+/usr/bin/ar qc libcounting.a  CMakeFiles/counting.dir/equation.cpp.o CMakeFiles/counting.dir/execution.cpp.o CMakeFiles/counting.dir/__/executable/command.cpp.o CMakeFiles/counting.dir/forest.cpp.o CMakeFiles/counting.dir/triangle.cpp.o CMakeFiles/counting.dir/aggregation.cpp.o
+/usr/bin/ranlib libcounting.a

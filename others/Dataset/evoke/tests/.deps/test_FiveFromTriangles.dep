@@ -1,0 +1,5 @@
+test_FiveFromTriangles.o .deps/test_FiveFromTriangles.dep: test_FiveFromTriangles.cpp ../Escape/GraphIO.h \
+ ../Escape/ErrorCode.h ../Escape/Graph.h ../Escape/TriangleProgram.h \
+ ../Escape/Graph.h ../Escape/JointSort.h ../Escape/Digraph.h \
+ ../Escape/Triadic.h ../Escape/FiveFromTriangles.h ../Escape/Utils.h \
+ ../Escape/FourVertex.h

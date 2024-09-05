@@ -1,0 +1,20 @@
+{
+  "dataset": [
+    "g8_graphs"
+  ],
+  "pattern": [
+    "p_htw3_3_3_16"
+  ],
+  "model": [
+    "cnn"
+  ],
+  "epoch": [
+    1
+  ],
+  "batch_size": [
+    4
+  ],
+  "device": [
+    "cuda:0"
+  ]
+}
