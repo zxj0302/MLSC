@@ -35,10 +35,10 @@
         "split_ratio": "4:1:1",
         "output_folder": "input"
     },
-    "plots_path": {
+    "plot_config": {
         "root_folder": "plots",
-        "samples_analysis": "input",
-        "prediction_analysis": "output"
+        "sample_path": "input",
+        "prediction_path": "output"
     },
     "algorithms": [
         {
@@ -126,7 +126,7 @@
     "execution_control": {
     "sample_oracle": false,
     "plot_sampled": false,
-    "run_experiments": true,
-    "plot_results": false
+    "run_experiments": false,
+    "plot_results": true
     }    
 }

@@ -73,7 +73,7 @@ if __name__ == '__main__':
     
     # fill the NaN values with 0
     predictions = predictions.fillna(0)
-    predictions.to_csv(output_folder + '/predictions.csv', index=False)
+    predictions.to_csv(output_folder + '/prediction.csv', index=False)
             
 
 
