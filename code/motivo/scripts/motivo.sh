@@ -136,7 +136,7 @@ get_nthreads()
     #echo 1
 }
 
-echo "[$(date)] MOTIVO Start" | tee $LOGFILE
+echo "[$(date +%Y-%m-%d' '%H:%M:%S.%N | cut -b 1-23)] MOTIVO Start" | tee $LOGFILE
 echo "output,graph,size,colors,compress_threshold,type,ntreelets,nsamples,nthreads,walltime,usertime,systemtime,actualtime" > $TIMEFILE
 
 EXTRA_BUILD_OPTS=()
@@ -159,13 +159,13 @@ build() {
 	fi
 	
 	echo -en "$i  \t\t"
-	echo "[$(date)] Building table of size $i" >> $LOGFILE
+	echo "[$(date +%Y-%m-%d' '%H:%M:%S.%N | cut -b 1-23)] Building table of size $i" >> $LOGFILE
 	($TIME $BUILDPATH/motivo-build --graph "$GRAPH" --size "$i" --colors "$SIZE" --tables-basename "$OUTPUT" --output "$OUTPUT" --threads "$THREADS" ${EXTRA_BUILD_OPTS[@]} > "$OUTPUT.b$i.log" 2>&1) || exit 1
 	echo -n $(get_walltime "$OUTPUT.b$i.log")
 	echo "$OUTPUT,$GRAPH,$i,$SIZE,$COMPRESS_THRESHOLD,build,0,0,$(get_nthreads "$OUTPUT.b$i.log"),$(get_walltime "$OUTPUT.b$i.log"),$(get_usertime "$OUTPUT.b$i.log"),$(get_systemtime "$OUTPUT.b$i.log"),$(get_actualtime "$OUTPUT.b$i.log")" >> $TIMEFILE
 
 	echo -en "\t\t"
-	echo "[$(date)] Merging table of size $i" >> $LOGFILE
+	echo "[$(date +%Y-%m-%d' '%H:%M:%S.%N | cut -b 1-23)] Merging table of size $i" >> $LOGFILE
 	($TIME $BUILDPATH/motivo-merge --output "$OUTPUT.$i" --compress-threshold "$COMPRESS_THRESHOLD" "$OUTPUT.$i.cnt" > "$OUTPUT.m$i.log" 2>&1) || exit 1
 	if [ $i -ne $SIZE ]; then
             echo $(get_walltime "$OUTPUT.m$i.log")
@@ -174,7 +174,7 @@ build() {
 	fi
 	echo "$OUTPUT,$GRAPH,$i,$SIZE,$COMPRESS_THRESHOLD,merge,$(get_ntreelets "$OUTPUT.m$i.log"),0,0,$(get_walltime "$OUTPUT.m$i.log"),$(get_usertime "$OUTPUT.m$i.log"),$(get_systemtime "$OUTPUT.m$i.log"),$(get_actualtime "$OUTPUT.m$i.log")" >> $TIMEFILE
 
-	echo "[$(date)] Done. Removing count file." >> $LOGFILE
+	echo "[$(date +%Y-%m-%d' '%H:%M:%S.%N | cut -b 1-23)] Done. Removing count file." >> $LOGFILE
 	rm "$OUTPUT.$i.cnt"
     done
 }
@@ -201,7 +201,7 @@ fi
 
 sample() {
     echo -en "\t\t"
-    echo "[$(date)] Sampling..." >> $LOGFILE
+    echo "[$(date +%Y-%m-%d' '%H:%M:%S.%N | cut -b 1-23)] Sampling..." >> $LOGFILE
     ($TIME $BUILDPATH/motivo-sample --graph "$GRAPH" --size "$SIZE" -n "$NSAMPLES" -i "$OUTPUT" -c --graphlets -o "$OUTPUT" --threads "$THREADS" ${EXTRA_SAMPLE_OPTS[@]} > "$OUTPUT.s$SIZE.log" 2>&1) || exit 1
     if [[ "$BUILD" == "NO" ]]; then 	echo -en "\t\t\t\t"; fi
     echo $(get_walltime "$OUTPUT.s${SIZE}.log")
@@ -217,7 +217,7 @@ sample() {
     echo "$OUTPUT,$GRAPH,$i,$SIZE,$COMPRESS_THRESHOLD,sample_naive,0,$NAIVES,$(get_nthreads "$OUTPUT.s$SIZE.log"),$NAIVET,,," >> $TIMEFILE
     echo "$OUTPUT,$GRAPH,$i,$SIZE,$COMPRESS_THRESHOLD,sample_ags,0,$ADAPTIVES,$(get_nthreads "$OUTPUT.s$SIZE.log"),$ADAPTIVET,,," >> $TIMEFILE
     
-    echo "[$(date)] Done" | tee -a $LOGFILE
+    echo "[$(date +%Y-%m-%d' '%H:%M:%S.%N | cut -b 1-23)] Done" | tee -a $LOGFILE
     
     echo "Samples are in $OUTPUT.csv:"
     head -6 $OUTPUT.csv

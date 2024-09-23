@@ -2,38 +2,85 @@
     "sample_config": {
         "db_path": "input/rwd.db",
         "save_path": null,
-        "constraints": {
+        "output_folder": "input",
+        "datasets": {
             "Set_1": {
-                "num_nodes": {"min": 0, "max": 200},
-                "degree_avg": {"max": 3},
-                "degree_max": {"max": 20},
-                "random_seed": 0,
-                "limit": 600
+                "constraints": {
+                    "num_nodes": {"min": 0, "max": 200},
+                    "degree_avg": {"max": 1.5},
+                    "random_seed": 0,
+                    "limit": 2100
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
             },
             "Set_2": {
-                "num_nodes": {"min": 0, "max": 200},
-                "degree_avg": {"min": 3, "max": 10},
-                "degree_max": {"min": 10, "max": 50},
-                "random_seed": 0,
-                "limit": 600
+                "constraints": {
+                    "num_nodes": {"min": 0, "max": 200},
+                    "degree_avg": {"min": 1.5, "max": 10},
+                    "random_seed": 0,
+                    "limit": 2100
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
             },
             "Set_3": {
-                "num_nodes": {"min": 200, "max": 500},
-                "degree_avg": {"max": 3},
-                "degree_max": {"max": 50},
-                "random_seed": 0,
-                "limit": 300
+                "constraints": {
+                    "num_nodes": {"min": 200, "max": 500},
+                    "degree_avg": {"max": 1.5},
+                    "random_seed": 0,
+                    "limit": 600
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
             },
             "Set_4": {
-                "num_nodes": {"min": 200, "max": 500},
-                "degree_avg": {"min": 3, "max": 10},
-                "degree_max": {"min": 50, "max": 100},
-                "random_seed": 0,
-                "limit": 300
+                "constraints": {
+                    "num_nodes": {"min": 200, "max": 500},
+                    "degree_avg": {"min": 1.5, "max": 50},
+                    "random_seed": 0,
+                    "limit": 600
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
+            },
+            "Set_5": {
+                "constraints": {
+                    "num_nodes": {"min": 100, "max": 5000},
+                    "random_seed": 0,
+                    "limit": 200
+                },
+                "split_ratio": "4:1:4",
+                "merge_test": true
+            },
+            "Set_6": {
+                "constraints": {
+                    "num_nodes": {"min": 100, "max": 5000},
+                    "random_seed": 0,
+                    "limit": 500
+                },
+                "split_ratio": "4:1:4",
+                "merge_test": true
+            },
+            "Set_7": {
+                "constraints": {
+                    "num_nodes": {"min": 100, "max": 5000},
+                    "random_seed": 0,
+                    "limit": 1000
+                },
+                "split_ratio": "4:1:4",
+                "merge_test": true
+            },
+            "Set_8": {
+                "constraints": {
+                    "num_nodes": {"min": 100, "max": 5000},
+                    "random_seed": 0,
+                    "limit": 2000
+                },
+                "split_ratio": "4:1:4",
+                "merge_test": true
             }
-        },
-        "split_ratio": "4:1:1",
-        "output_folder": "input"
+        }
     },
     "plot_config": {
         "root_folder": "plots",
@@ -116,17 +163,37 @@
         },
         {
             "name": "ESC-GNN",
-            "container_config": {}
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:ESC-GNN_LINUX",
+                "name": "ESC_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "/home/zxj/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15",
+                "device_requests": [{"Driver": "", "Count": -1, "DeviceIDs": null, "Capabilities": [["gpu"]], "Options": null}]
+            },
+            "command": [
+                "docker", "exec", "-it", "ESC_EXP", "bash", "-ilc", "cd /workspace/code/ESC-GNN && conda activate ESC-GNN && python esc_run.py /workspace/input /workspace/output"
+            ]
+            
         },
         {
             "name": "I2GNN",
+            "container_config": {}
+        },
+        {
+            "name": "LPP",
             "container_config": {}
         }
     ],
     "execution_control": {
     "sample_oracle": false,
     "plot_sampled": false,
-    "run_experiments": false,
-    "plot_results": true
+    "run_experiments": true,
+    "plot_results": false
     }    
 }

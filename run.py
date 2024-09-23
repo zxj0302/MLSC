@@ -16,6 +16,7 @@ from tqdm import tqdm
 from rwdq import run_query
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
+from torch_geometric.data import Data
 
 warnings.filterwarnings("ignore")
 
@@ -57,24 +58,39 @@ class ColoredLogger:
 
 logger = ColoredLogger()
 
+def collate_test(data_list):
+    edge_index = []
+    cumulative_nodes = 0
+    for data in data_list:
+        edge_index.append(data.edge_index + torch.tensor(cumulative_nodes, dtype=torch.int64))
+        cumulative_nodes += data.num_nodes
+    
+    gt_induced_le5 = torch.cat([data.gt_induced_le5 for data in data_list], dim=0)
+    gt_induced_le5_desco = torch.cat([data.gt_induced_le5_desco for data in data_list], dim=0)
+    edge_index = torch.cat(edge_index, dim=1)
+    
+    return Data(edge_index=edge_index, gt_induced_le5=gt_induced_le5, gt_induced_le5_desco=gt_induced_le5_desco, num_nodes=cumulative_nodes, source='combined')
+
 def sample_oracle(sample_config):
-    for key, value in sample_config['constraints'].items():
+    for key, value in sample_config['datasets'].items():
         if key.startswith('Set_'):
             output_folder = os.path.join(sample_config['output_folder'], key)
             if not os.path.exists(output_folder):
                 os.makedirs(output_folder)
             config_file = os.path.join(output_folder, 'config.json')
             with open(config_file, 'w') as file:
-                json.dump(value, file, indent=4)
+                json.dump(value["constraints"], file, indent=4)
 
             samples = run_query(config_file, sample_config['db_path'], sample_config['save_path'])
-            split_ratio = [int(x) for x in sample_config['split_ratio'].split(':')]
+            split_ratio = [int(x) for x in value['split_ratio'].split(':')]
             s1, s2 = [int(len(samples) * r / sum(split_ratio)) for r in split_ratio[:2]]
             dataset = {
                 'train': samples[:s1],
                 'val': samples[s1:s1+s2],
                 'test': samples[s1+s2:]
             }
+            if value['merge_test']:
+                dataset['test'] = [collate_test(dataset['test'])]
             torch.save(dataset, os.path.join(output_folder, 'dataset.pt'))
 
 def plot_sampled(plot_config):
@@ -111,7 +127,7 @@ def plot_sampled(plot_config):
             ax_pattern.axis('off')
         
         fig.suptitle(f'Ground Truth Distribution: {dataset_name}', fontsize=20, fontweight='bold', y=0.02)
-        fig.legend(plot_objects, splits, loc='upper center', bbox_to_anchor=(0.5, 0.98), ncol=num_algs, fontsize=18)
+        fig.legend(plot_objects, splits, loc='upper center', bbox_to_anchor=(0.5, 0.98), ncol=3, fontsize=18)
         fig.text(0.959, 0.03, 'Local Counts', ha='center', va='center', fontsize=14, fontweight='bold')
         fig.text(0.023, 0.955, '#Nodes', ha='center', va='center', fontsize=14, fontweight='bold')
         fig.subplots_adjust(left=0.02, right=0.98, top=0.94, bottom=0.05)
@@ -122,7 +138,7 @@ def plot_sampled(plot_config):
         plt.savefig(os.path.join(output_path, f'{dataset_name}.pdf'), format='pdf')
 
 def run_experiments(algorithms):
-    for alg in algorithms[:4]:
+    for alg in algorithms[0:1]:
         logger.info(f"Running experiments for {alg['name']}")
         client = docker.from_env()
         container_config = alg.get('container_config', {})
@@ -141,38 +157,38 @@ def plot_results(plot_config):
     prediction_path = plot_config['prediction_path']
     num_sets = len([entry.name for entry in os.scandir(prediction_path) if entry.is_dir()])
 
-    # # 1. runtime comparison
-    # fig, axes = plt.subplots(1, num_sets, figsize=(6*num_sets, 6))
-    # for index, dataset_name in tqdm(enumerate([f'Set_{i+1}' for i in range(num_sets)]), desc='plotting runtime', total=num_sets):
-    #     runtime = {}
-    #     for alg in ['ESCAPE', 'EVOKE', 'MOTIVO']:
-    #         with open(os.path.join(prediction_path, dataset_name, alg, 'time.txt'), 'r') as file:
-    #             runtime[alg] = round(float(file.readline().strip()), 3)
+    # 1. runtime comparison
+    fig, axes = plt.subplots(1, num_sets, figsize=(6*num_sets, 6))
+    for index, dataset_name in tqdm(enumerate([f'Set_{i+1}' for i in range(num_sets)]), desc='plotting runtime', total=num_sets):
+        runtime = {}
+        for alg in ['ESCAPE', 'EVOKE', 'MOTIVO']:
+            with open(os.path.join(prediction_path, dataset_name, alg, 'time.txt'), 'r') as file:
+                runtime[alg] = round(float(file.readline().strip()), 3)
 
-    #     with open(os.path.join(prediction_path, dataset_name, 'DeSCo', 'pretrained', 'time.txt'), 'r') as file:
-    #         runtime['DeSCo-P'] = round(float(file.readline().strip().split()[0]), 3)
-    #     with open(os.path.join(prediction_path, dataset_name, 'DeSCo', 'finetuned', 'time.txt'), 'r') as file:
-    #         runtime['DeSCo-F'] = round(float(file.readline().strip().split()[0]), 3)
+        with open(os.path.join(prediction_path, dataset_name, 'DeSCo', 'pretrained', 'time.txt'), 'r') as file:
+            runtime['DeSCo-P'] = round(float(file.readline().strip().split()[0]), 3)
+        with open(os.path.join(prediction_path, dataset_name, 'DeSCo', 'finetuned', 'time.txt'), 'r') as file:
+            runtime['DeSCo-F'] = round(float(file.readline().strip().split()[0]), 3)
 
-    #     algs = list(runtime.keys())
-    #     values = list(runtime.values())
-    #     ax = axes[index] if num_sets > 1 else axes
-    #     bars = ax.bar(algs, values, color=['#FF9999', '#66B2FF', '#99FF99', '#FFCC99', '#FF99CC'], alpha=0.5)
-    #     for bar in bars:
-    #         height = bar.get_height()
-    #         ax.text(bar.get_x() + bar.get_width()/2., height,
-    #                 f'{height:.3f}',
-    #                 ha='center', va='bottom')
-    #     ax.set_title(dataset_name, fontsize=16, fontweight='bold')
-    #     ax.set_yscale('log')
-    #     ax.set_xticklabels(algs, ha='center', fontsize=12)
+        algs = list(runtime.keys())
+        values = list(runtime.values())
+        ax = axes[index] if num_sets > 1 else axes
+        bars = ax.bar(algs, values, color=['#FF9999', '#66B2FF', '#99FF99', '#FFCC99', '#FF99CC'], alpha=0.5)
+        for bar in bars:
+            height = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width()/2., height,
+                    f'{height:.3f}',
+                    ha='center', va='bottom')
+        ax.set_title(dataset_name, fontsize=16, fontweight='bold')
+        ax.set_yscale('log')
+        ax.set_xticklabels(algs, ha='center', fontsize=12)
     
-    # fig.text(0.0, 0.5, 'Runtime (seconds)', va='center', rotation='vertical', fontsize=12)
-    # plt.tight_layout()
-    # plt.subplots_adjust(bottom=0.2)
-    # fig.suptitle('Runtime Comparison', fontsize=20, fontweight='bold', y=0.15)
-    # plt.savefig(os.path.join(plot_config['root_folder'], 'prediction', 'runtime.pdf'), format='pdf', bbox_inches='tight')
-    # plt.close(fig)
+    fig.text(0.0, 0.5, 'Runtime (seconds)', va='center', rotation='vertical', fontsize=12)
+    plt.tight_layout()
+    plt.subplots_adjust(bottom=0.2)
+    fig.suptitle('Runtime Comparison', fontsize=20, fontweight='bold', y=0.15)
+    plt.savefig(os.path.join(plot_config['root_folder'], 'prediction', 'runtime.pdf'), format='pdf', bbox_inches='tight')
+    plt.close(fig)
 
     # 2. accuracy distribution(MAE, Q-ERROE) for all 29 patterns
     num_nodes = torch.tensor([3] * 2 + [4] * 6 + [5] * 21)

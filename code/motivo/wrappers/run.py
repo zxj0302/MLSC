@@ -23,18 +23,27 @@ def process_file(i):
     start = time.time()
     os.system(f'../scripts/motivo.sh -g input_bin/{dataset_name}/input_{i} -k 5 -o output/{dataset_name}/{i} --build > /dev/null')
     time_build = time.time() - start
+    
+    # read the number of nodes and set sample number
+    num_samples = max(int(open(f'{edgelist_path}/{i}.edges', 'r').readline().split()[0]) * 10, 10000)
 
     start = time.time()
-    os.system(f'../scripts/motivo.sh -g input_bin/{dataset_name}/input_{i} -k 3 -o output/{dataset_name}/{i}_3 --sample -s 10000 -a > /dev/null')
+    os.system(f'../scripts/motivo.sh -g input_bin/{dataset_name}/input_{i} -k 3 -o output/{dataset_name}/{i} --sample -s {num_samples} -a > /dev/null')
     time_3 = time.time() - start
+    if os.path.exists(f'output/{dataset_name}/{i}.csv'):
+        os.system(f'mv output/{dataset_name}/{i}.csv output/{dataset_name}/{i}_3.csv')
 
     start = time.time()
-    os.system(f'../scripts/motivo.sh -g input_bin/{dataset_name}/input_{i} -k 4 -o output/{dataset_name}/{i}_4 --sample -s 10000 -a > /dev/null')
+    os.system(f'../scripts/motivo.sh -g input_bin/{dataset_name}/input_{i} -k 4 -o output/{dataset_name}/{i} --sample -s {num_samples} -a > /dev/null')
     time_4 = time.time() - start
+    if os.path.exists(f'output/{dataset_name}/{i}.csv'):
+        os.system(f'mv output/{dataset_name}/{i}.csv output/{dataset_name}/{i}_4.csv')
 
     start = time.time()
-    os.system(f'../scripts/motivo.sh -g input_bin/{dataset_name}/input_{i} -k 5 -o output/{dataset_name}/{i}_5 --sample -s 10000 -a > /dev/null')
+    os.system(f'../scripts/motivo.sh -g input_bin/{dataset_name}/input_{i} -k 5 -o output/{dataset_name}/{i} --sample -s {num_samples} -a > /dev/null')
     time_5 = time.time() - start
+    if os.path.exists(f'output/{dataset_name}/{i}.csv'):
+        os.system(f'mv output/{dataset_name}/{i}.csv output/{dataset_name}/{i}_5.csv')
 
     return i, time_conversion, time_build, time_3, time_4, time_5
 
@@ -74,8 +83,3 @@ if __name__ == '__main__':
     # fill the NaN values with 0
     predictions = predictions.fillna(0)
     predictions.to_csv(output_folder + '/prediction.csv', index=False)
-            
-
-
-    
-            
