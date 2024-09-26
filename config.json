@@ -6,45 +6,68 @@
         "datasets": {
             "Set_1": {
                 "constraints": {
-                    "num_nodes": {"min": 0, "max": 200},
+                    "num_nodes": {"min": 0, "max": 500},
                     "degree_avg": {"max": 1.5},
+                    "degree_max": {"max": 100},
                     "random_seed": 0,
-                    "limit": 2100
+                    "limit": 1200
                 },
                 "split_ratio": "4:1:1",
                 "merge_test": false
             },
             "Set_2": {
                 "constraints": {
-                    "num_nodes": {"min": 0, "max": 200},
-                    "degree_avg": {"min": 1.5, "max": 10},
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"max": 1.5},
                     "random_seed": 0,
-                    "limit": 2100
+                    "limit": 1200
                 },
                 "split_ratio": "4:1:1",
                 "merge_test": false
             },
             "Set_3": {
                 "constraints": {
-                    "num_nodes": {"min": 200, "max": 500},
-                    "degree_avg": {"max": 1.5},
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"min": 1.5, "max": 5},
+                    "degree_max": {"max": 100},
                     "random_seed": 0,
-                    "limit": 600
+                    "limit": 1200
                 },
                 "split_ratio": "4:1:1",
                 "merge_test": false
             },
             "Set_4": {
                 "constraints": {
-                    "num_nodes": {"min": 200, "max": 500},
-                    "degree_avg": {"min": 1.5, "max": 50},
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"min": 1.5, "max": 5},
                     "random_seed": 0,
-                    "limit": 600
+                    "limit": 1200
                 },
                 "split_ratio": "4:1:1",
                 "merge_test": false
             },
             "Set_5": {
+                "constraints": {
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"min": 5, "max": 10},
+                    "degree_max": {"max": 100},
+                    "random_seed": 0,
+                    "limit": 1200
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
+            },
+            "Set_6": {
+                "constraints": {
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"min": 5, "max": 10},
+                    "random_seed": 0,
+                    "limit": 1200
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
+            },
+            "Set_7": {
                 "constraints": {
                     "num_nodes": {"min": 100, "max": 5000},
                     "random_seed": 0,
@@ -53,7 +76,7 @@
                 "split_ratio": "4:1:4",
                 "merge_test": true
             },
-            "Set_6": {
+            "Set_8": {
                 "constraints": {
                     "num_nodes": {"min": 100, "max": 5000},
                     "random_seed": 0,
@@ -62,7 +85,7 @@
                 "split_ratio": "4:1:4",
                 "merge_test": true
             },
-            "Set_7": {
+            "Set_9": {
                 "constraints": {
                     "num_nodes": {"min": 100, "max": 5000},
                     "random_seed": 0,
@@ -71,7 +94,7 @@
                 "split_ratio": "4:1:4",
                 "merge_test": true
             },
-            "Set_8": {
+            "Set_10": {
                 "constraints": {
                     "num_nodes": {"min": 100, "max": 5000},
                     "random_seed": 0,
@@ -90,6 +113,7 @@
     "algorithms": [
         {
             "name": "DeSCo",
+            "skip": true,
             "container_config": {
                 "image": "zhuxiangju/benchmark_subgraphcounting:DeSCo_LINUX",
                 "name": "DeSCo_EXP",
@@ -109,6 +133,7 @@
         },
         {
             "name": "ESCAPE",
+            "skip": true,
             "container_config": {
                 "image": "zhuxiangju/benchmark_subgraphcounting:BASIC",
                 "name": "ESCAPE_EXP",
@@ -127,6 +152,7 @@
         },
         {
             "name": "EVOKE",
+            "skip": true,
             "container_config": {
                 "image": "zhuxiangju/benchmark_subgraphcounting:BASIC",
                 "name": "EVOKE_EXP",
@@ -145,6 +171,7 @@
         },
         {
             "name": "MOTIVO",
+            "skip": true,
             "container_config": {
                 "image": "zhuxiangju/benchmark_subgraphcounting:MOTIVO",
                 "name": "MOTIVO_EXP",
@@ -163,6 +190,7 @@
         },
         {
             "name": "ESC-GNN",
+            "skip": false,
             "container_config": {
                 "image": "zhuxiangju/benchmark_subgraphcounting:ESC-GNN_LINUX",
                 "name": "ESC_EXP",
@@ -183,10 +211,12 @@
         },
         {
             "name": "I2GNN",
+            "skip": true,
             "container_config": {}
         },
         {
             "name": "LPP",
+            "skip": true,
             "container_config": {}
         }
     ],

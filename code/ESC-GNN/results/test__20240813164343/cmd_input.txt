@@ -1,1 +1,0 @@
-python run_graphcount.py --batch_size 128 --target 0 --model NestedGIN_eff --h 1 --lr 8e-3 --dataset test

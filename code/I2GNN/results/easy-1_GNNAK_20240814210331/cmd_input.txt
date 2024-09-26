@@ -1,1 +1,0 @@
-python run_count.py --batch_size 256 --target 7 --model GNNAK --h 3 --seed 1 --epoch 2000 --dataset easy-1

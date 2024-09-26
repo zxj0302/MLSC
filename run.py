@@ -92,6 +92,10 @@ def sample_oracle(sample_config):
             if value['merge_test']:
                 dataset['test'] = [collate_test(dataset['test'])]
             torch.save(dataset, os.path.join(output_folder, 'dataset.pt'))
+            dataset_converted = {}
+            for key in dataset.keys():
+                dataset_converted[key] = [Data(x=torch.ones(g.num_nodes, 1), y=g.gt_induced_le5[:, 1:], edge_index=g.edge_index).to_dict() for g in dataset[key]]
+            torch.save(dataset_converted, os.path.join(output_folder, 'dataset_compatible.pt'))
 
 def plot_sampled(plot_config):
     # TODO: parameterize more
@@ -138,20 +142,21 @@ def plot_sampled(plot_config):
         plt.savefig(os.path.join(output_path, f'{dataset_name}.pdf'), format='pdf')
 
 def run_experiments(algorithms):
-    for alg in algorithms[0:1]:
-        logger.info(f"Running experiments for {alg['name']}")
-        client = docker.from_env()
-        container_config = alg.get('container_config', {})
-        try:
-            client.containers.get(container_config['name']).remove(force=True)
-        except docker.errors.NotFound:
-            pass
-        container = client.containers.run(**container_config)
-        try:
-            subprocess.run(alg.get('command'))
-        finally:
-            # container.stop()
-            container.remove(force=True)
+    for alg in algorithms:
+        if alg.get('skip', True) == False:
+            logger.info(f"Running experiments for {alg['name']}")
+            client = docker.from_env()
+            container_config = alg.get('container_config', {})
+            try:
+                client.containers.get(container_config['name']).remove(force=True)
+            except docker.errors.NotFound:
+                pass
+            container = client.containers.run(**container_config)
+            try:
+                subprocess.run(alg.get('command'))
+            finally:
+                # container.stop()
+                container.remove(force=True)
 
 def plot_results(plot_config):
     prediction_path = plot_config['prediction_path']

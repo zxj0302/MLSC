@@ -32,6 +32,8 @@ from sklearn.metrics import mean_absolute_error as MAE
 from modules.ppgn_modules import *
 from torch_geometric.utils import degree, dropout_adj, to_dense_batch, to_dense_adj
 
+times = {}
+
 def MyTransform(data):
     data.y = data.y[:, int(args.target)]
     return data
@@ -373,7 +375,7 @@ device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cp
 if args.save_appendix == '':
     args.save_appendix = '_' + time.strftime("%Y%m%d%H%M%S")
 args.res_dir = 'results/' + args.dataset + '_' + args.save_appendix
-print('Results will be saved in ' + args.res_dir)
+# print('Results will be saved in ' + args.res_dir)
 if not os.path.exists(args.res_dir):
     os.makedirs(args.res_dir)
 # Backup python files.
@@ -384,14 +386,15 @@ copy('kernel/gin.py', args.res_dir)
 cmd_input = 'python ' + ' '.join(sys.argv) + '\n'
 with open(os.path.join(args.res_dir, 'cmd_input.txt'), 'a') as f:
     f.write(cmd_input)
-print('Command line input: ' + cmd_input + ' is saved.')
+# print('Command line input: ' + cmd_input + ' is saved.')
 
 
 target = int(args.target)
-print('---- Target: {} ----'.format(target))
+# print('---- Target: {} ----'.format(target))
 
 path = 'data/Count'
 
+start = time.time()
 pre_transform = None
 if args.h is not None:
     if type(args.h) == int:
@@ -406,7 +409,8 @@ if args.h is not None:
                                 max_nodes_per_hop=args.max_nodes_per_hop,
                                 node_label=args.node_label,
                                 use_rd=True, self_loop = True)
-
+times['pre_transform'] = time.time() - start
+start = time.time()
 
 pre_filter = None
 if args.model == "NestedGIN_eff":
@@ -421,6 +425,7 @@ dataname = args.dataset
 processed_name = dataname
 if args.h is not None:
     processed_name = processed_name + "_h" + str(args.h)
+ 
 
 train_dataset = dataset_random_graph(dataname=dataname,processed_name=processed_name, transform=MyTransform,
                                         pre_transform=my_pre_transform, split='train')
@@ -428,7 +433,8 @@ val_dataset = dataset_random_graph(dataname=dataname,processed_name=processed_na
                                         pre_transform=my_pre_transform, split='val')
 test_dataset = dataset_random_graph(dataname=dataname,processed_name=processed_name, transform=MyTransform,
                                         pre_transform=my_pre_transform, split='test')
-
+times['dataset_random_graph'] = time.time() - start
+start = time.time()
 
 # ablation study for I2GNN
 if args.ab:
@@ -446,13 +452,17 @@ train_dataset.data.y = (train_dataset.data.y - mean) / std
 val_dataset.data.y = (val_dataset.data.y - mean) / std
 test_dataset.data.y = (test_dataset.data.y - mean) / std
 
-print('Mean = %.3f, Std = %.3f' % (mean[args.target], std[args.target]))
-
+# print('Mean = %.3f, Std = %.3f' % (mean[args.target], std[args.target]))
+times['normalize_target'] = time.time() - start
+start = time.time()
 
 
 test_loader = DataLoader(test_dataset, batch_size=args.batch_size)
 val_loader = DataLoader(val_dataset, batch_size=args.batch_size)
 train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+
+times['dataloader'] = time.time() - start
+start = time.time()
 
 kwargs = {
     'num_layers': args.layers,
@@ -472,13 +482,14 @@ else:
 if args.load_model != None:
     cpt = torch.load(args.load_model)
     model.load_state_dict(cpt)
-print('Using ' + model.__class__.__name__ + ' model')
+# print('Using ' + model.__class__.__name__ + ' model')
 model = model.to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
     optimizer, mode='min',factor=args.lr_decay_factor, patience=args.patience, min_lr=0.00001)
 
+times['model_loading'] = time.time() - start
 
 def train(epoch):
     model.train()
@@ -487,10 +498,10 @@ def train(epoch):
     for t, data in enumerate(train_loader):
         if type(data) == dict:
             data = {key: data_.to(device) for key, data_ in data.items()}
-            num_graphs = data[args.h[0]].num_graphs
+            # num_graphs = data[args.h[0]].num_graphs
         else:
             data = data.to(device)
-            num_graphs = data.num_graphs
+            # num_graphs = data.num_graphs
         optimizer.zero_grad()
         y = data.y
         y = y.view([y.size(0), 1])
@@ -506,9 +517,10 @@ def train(epoch):
     return loss_all / train_dataset.data.y.size(0)
 
 
-def test(loader):
+def test(loader, output=False):
     model.eval()
-    y_true = None; y_pred = None
+    y_pred = []
+    y_true = []
     error = 0; num = 0
     with torch.no_grad():
         model.eval()
@@ -524,6 +536,12 @@ def test(loader):
 
             error += torch.sum(torch.abs(y_hat - y))
             num += y.size(0)
+            if output:
+                # Denormalize
+                y_pred.extend(((y_hat * std[args.target] + mean[args.target]).cpu().numpy()).tolist())
+                y_true.extend(((y * std[args.target] + mean[args.target]).cpu().numpy()).tolist())
+    if output:
+        return y_pred, y_true
     return error / num * (std[args.target])
 
 
@@ -550,7 +568,7 @@ def visualize(loader):
                     error_dict[y] = [y_hat[i].item()]
             error += torch.sum(torch.abs(y_hat - ys))
             num += ys.size(0)
-        print('Average MAE on test set: %.5f' % (error / num))
+        # print('Average MAE on test set: %.5f' % (error / num))
 
         # analysis
         nrings = []
@@ -567,7 +585,7 @@ def visualize(loader):
             maes.append(mae)
             sigmas.append(sigma)
             num_samples.append(pred.shape[0])
-            print('graphs with %d %d-cycles: total %d, MAE = %.5f +- %.5f' % (key, args.target+3, pred.shape[0], mae, sigma))
+            # print('graphs with %d %d-cycles: total %d, MAE = %.5f +- %.5f' % (key, args.target+3, pred.shape[0], mae, sigma))
 
         # plot
         maes = np.array(maes)
@@ -581,10 +599,11 @@ def visualize(loader):
         np.save('./cpt/idgnn_random_node_2_std.npy', sigmas)
 
 def loop(start=1, best_val_error=None):
-    pbar = tqdm(range(start, args.epochs+start))
+    pbar = range(start, args.epochs+start)
     count = 0
+    start_time = time.time()
     for epoch in pbar:
-        pbar.set_description('Epoch: {:03d}'.format(epoch))
+        # pbar.set_description('Epoch: {:03d}'.format(epoch))
         lr = scheduler.optimizer.param_groups[0]['lr']
         loss = train(epoch)
         val_error = test(val_loader)
@@ -604,9 +623,26 @@ def loop(start=1, best_val_error=None):
                 test_error,
                 test_error / (std[target]).cuda(),
             )
-            print('\n'+log+'\n')
+            # # print('\n'+log+'\n')
             with open(os.path.join(args.res_dir, 'log.txt'), 'a') as f:
                 f.write(log + '\n')
+    result = {}
+    times['training'] = time.time() - start_time
+    
+    
+
+    start_time = time.time()
+    y_pred, y_true = test(test_loader, output=True)
+    times['inference'] = time.time() - start_time
+    result['time_profile'] = times
+
+    result['Prediction'] = y_pred
+    result['Ground-Truth'] = y_true
+    # write the results to a json file
+    import json
+    with open(os.path.join(f"/workspace/output/{args.dataset}/ESC-GNN", f'target_{args.target}.json'), 'w') as f:
+        json.dump(result, f)
+
     model_name = os.path.join(args.res_dir, 'model_checkpoint{}.pth'.format(epoch))
     torch.save(model.state_dict(), model_name)
     start = epoch + 1
@@ -617,8 +653,8 @@ best_val_error = None
 start = 1
 
 start, best_val_error, log = loop(start, best_val_error)
-print(cmd_input[:-1])
-print(log)
+# print(cmd_input[:-1])
+# print(log)
 with open(os.path.join(args.res_dir, 'log.txt'), 'a') as f:
     f.write(log + '\n')
 

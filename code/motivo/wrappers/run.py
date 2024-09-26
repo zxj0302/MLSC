@@ -50,7 +50,7 @@ def process_file(i):
 
 if __name__ == '__main__':
     start_whole = time.time()
-    with Pool(8) as pool:
+    with Pool(min(8, num_file)) as pool:
         results = list(tqdm(pool.imap_unordered(process_file, range(num_file)), 
                             total=num_file, 
                             desc=dataset_name))

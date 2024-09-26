@@ -28,7 +28,7 @@ def create_graph_from_edge_index(data: Any) -> nx.Graph:
 
 def extract_counts(data: Any) -> np.ndarray:
     """Extract counts from gt_induced_le5 and cast them to float32."""
-    return data.gt_induced_le5[:, [1,2,3,4,5,6,7,8]].numpy().astype(np.float32)
+    return data.gt_induced_le5[:, list(range(29))].numpy().astype(np.float32)
 
 def parse_ratio(ratio_str: str) -> Tuple[int, int, int]:
     """Parse the input ratio string to integers."""

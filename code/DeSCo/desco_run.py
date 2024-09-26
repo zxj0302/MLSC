@@ -81,11 +81,11 @@ def run_pretrained(output_folder, dataset_name):
         with open(os.path.join(output_pretrained, 'error_run_command.txt'), 'w') as file:
             file.write(str(exit_code))
 
-def run_finetuned(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, gossip_batch_size):
+def run_finetuned(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, neigh_batch_size, gossip_batch_size):
     output_finetuning = os.path.abspath(os.path.join(output_folder, "finetuning"))
     if os.path.exists(output_finetuning):
         os.system(f'rm -rf {output_finetuning}/*')
-    command_finetuning = f'python main.py --neigh_checkpoint ckpt/neighborhood_counting.ckpt --gossip_checkpoint ckpt/gossip_propagation.ckpt --train_dataset {dataset_name} --valid_dataset {dataset_name} --test_dataset {dataset_name} --train_neigh --train_gossip --test_gossip --output_path {output_finetuning} --neigh_epoch_num {neigh_epoch_num} --gossip_epoch_num {gossip_epoch_num} --gossip_batch_size {gossip_batch_size}'
+    command_finetuning = f'python main.py --neigh_checkpoint ckpt/neighborhood_counting.ckpt --gossip_checkpoint ckpt/gossip_propagation.ckpt --train_dataset {dataset_name} --valid_dataset {dataset_name} --test_dataset {dataset_name} --train_neigh --train_gossip --test_gossip --output_path {output_finetuning} --neigh_epoch_num {neigh_epoch_num} --gossip_epoch_num {gossip_epoch_num} --neigh_batch_size {neigh_batch_size} --gossip_batch_size {gossip_batch_size}'
     exit_code = os.system(command_finetuning)
     if exit_code == 0:
         # extract training time from fine-tuning
@@ -173,11 +173,11 @@ def run_finetuned(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num
         with open(os.path.join(output_finetuning, 'error_run_command.txt'), 'w') as file:
             file.write(str(exit_code))
 
-def run_retrained(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, gossip_batch_size):
+def run_retrained(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, neigh_batch_size, gossip_batch_size):
     output_retraining = os.path.abspath(os.path.join(output_folder, "retraining"))
     if os.path.exists(output_retraining):
         os.system(f'rm -rf {output_retraining}/*')
-    command_retraining = (f'python main.py --train_dataset {dataset_name} --valid_dataset {dataset_name} --test_dataset {dataset_name} --train_neigh --train_gossip --test_gossip --output_path {output_retraining} --neigh_epoch_num {neigh_epoch_num} --gossip_epoch_num {gossip_epoch_num} --gossip_batch_size {gossip_batch_size}')
+    command_retraining = (f'python main.py --train_dataset {dataset_name} --valid_dataset {dataset_name} --test_dataset {dataset_name} --train_neigh --train_gossip --test_gossip --output_path {output_retraining} --neigh_epoch_num {neigh_epoch_num} --gossip_epoch_num {gossip_epoch_num} --neigh_batch_size {neigh_batch_size} --gossip_batch_size {gossip_batch_size}')
     exit_code = os.system(command_retraining)
     if exit_code == 0:
         # extract training time from re-training
@@ -267,7 +267,7 @@ def run_retrained(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num
 
 def main(input_path, output_path):
     # for all the folders named Set_i in the sampled_data_path folder, do the following:
-    for i in range(5, len([s for s in os.listdir(input_path) if re.match(r"Set_\d+$", s)]) + 1):
+    for i in range(1, len([s for s in os.listdir(input_path) if re.match(r"Set_\d+$", s)]) + 1):
         dataset_name = f'Set_{i}'
         output_folder = os.path.join(output_path, dataset_name, 'DeSCo')
         # change the directory
@@ -280,10 +280,12 @@ def main(input_path, output_path):
         # 3. fine-tune the model
         neigh_epoch_num = 300
         gossip_epoch_num = 30
-        gossip_batch_size = 20
-        run_finetuned(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, gossip_batch_size)
+        neigh_batch_size = 128
+        num_test_graph = len(torch.load(os.path.join(input_path, dataset_name, 'dataset.pt'))['test'])
+        gossip_batch_size = 32 if num_test_graph > 32 else 1
+        run_finetuned(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, neigh_batch_size, gossip_batch_size)
         # 4. re-train the model
-        run_retrained(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, gossip_batch_size)
+        run_retrained(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, neigh_batch_size, gossip_batch_size)
 
 if __name__ == '__main__':
     input_path = sys.argv[1]
