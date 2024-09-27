@@ -113,7 +113,7 @@
     "algorithms": [
         {
             "name": "DeSCo",
-            "skip": true,
+            "skip": false,
             "container_config": {
                 "image": "zhuxiangju/benchmark_subgraphcounting:DeSCo_LINUX",
                 "name": "DeSCo_EXP",

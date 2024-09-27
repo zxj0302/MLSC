@@ -129,7 +129,7 @@ def generate_esc_commands(config: Dict[str, Any], dataset: str) -> List[str]:
         config_copy['h'], config_copy['lr'], config_copy['layers'], config_copy['dataset']
     ))
 
-    return [f"{base_command} --batch_size {p[0]} --target {p[1]} --model {p[2]} --h {target_diam[p[1]]} --lr {p[4]} --epochs 1 --layers {p[5]} --dataset {p[6]}" for p in param_combinations]
+    return [f"{base_command} --batch_size {p[0]} --target {p[1]} --model {p[2]} --h {target_diam[p[1]]} --lr {p[4]} --epochs 2000 --layers {p[5]} --dataset {p[6]}" for p in param_combinations]
 
 def execute_command(full_command: str) -> Tuple[float, resource.struct_rusage, resource.struct_rusage, int]:
     start_time = time.time()
