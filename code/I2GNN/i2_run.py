@@ -12,20 +12,24 @@ from typing import List, Tuple, Dict
 from tqdm import tqdm
 
 # Constants
-TARGET_DIAM = [2, 1, 2, 3, 2, 2, 2, 1, 2, 3, 4, 2, 3, 2, 3, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
-BATCH_SIZE = [128, 128, 128, 128]
+MODELS = ["GNN"] # "PPGN", "GNN",, "PPGN" "IDGNN", , "GNNAK"
+ESCAPE_TARGET_DIAM = [2, 1,  2, 3, 2, 2, 2, 1,   2, 3, 4, 2, 3, 2, 3, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
+TARGET_DIAM =        [2, 1,  3, 2, 2, 2, 2, 1,   4, 3, 2, 3, 3, 2, 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
+# BATCH_SIZE = [16, 32, 128, 256]
+BATCH_SIZE = [256, 256, 256, 256]
 
 # Datasets
-DATASETS = ["data_esc"] + [f"Set_{i}" for i in range(9, 11)]
+DATASETS = ["data_esc"]+ [f"Set_{i}" for i in range(9, 11)]
 
 # Configuration
 EXP_CONFIG = {
     "h": [3],
     "batch_size": [128],
-    "target": list(range(29)),
-    "dataset": "data_esc",
-    "lr": [1e-2],
-    "layers": [3],
+    "target": [7, 10, 8, 15], # 7,10 list(range(29)), # [0, 1, 3, 10],
+    "model": MODELS,
+    "dataset": "data_esc", #[f"Set_{i}" for i in range(1, 2)],
+    "lr": [0.001],
+    "layers": [4],
 }
 
 # Setup logging
@@ -33,32 +37,31 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 def parse_arguments() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run ESC-GNN experiments")
+    parser = argparse.ArgumentParser(description="Run I2-GNN experiments")
     parser.add_argument("input_folder", help="Path to the input folder containing dataset folders")
     parser.add_argument("output_folder", help="Path to the output folder")
     return parser.parse_args()
 
-def generate_esc_commands(dataset: str) -> List[str]:
-    base_command = "python run_graphcount.py"
+def generate_i2_commands(dataset: str) -> List[str]:
+    base_command = "python run_count.py"
     config = EXP_CONFIG.copy()
     config['dataset'] = [dataset]
     param_combinations = list(itertools.product(
-        config['batch_size'], config['target'], config['h'], 
-        config['lr'], config['layers'], config['dataset']
+        config['batch_size'], config['target'], config['model'],
+        config['h'], config['lr'], config['layers'], config['dataset']
     ))
 
     return [
-        f"{base_command} --batch_size {BATCH_SIZE[-TARGET_DIAM[p[1]]]} --target {p[1]} "
-        f"--model NestedGIN_eff --h {TARGET_DIAM[p[1]]} --lr {p[3]} --epochs 2000 "
-        f"--layers {p[4]} --dataset {p[5]}"
+        f"{base_command} --batch_size {BATCH_SIZE[-TARGET_DIAM[p[1]]]} --target {p[1]} --model {p[2]} "
+        f"--h {TARGET_DIAM[p[1]]} --lr {p[4]} --epoch 2000 --dataset {p[6]}"
         for p in param_combinations
     ]
 
-def execute_command(command: str) -> Tuple[float, float, int, int, bytes]:
+def execute_command(command: str) -> Tuple[float, float, int, int]:
     start_time = time.time()
     usage_start = resource.getrusage(resource.RUSAGE_CHILDREN)
     
-    process = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE)
+    process = subprocess.Popen(command, shell=True, stderr=subprocess.PIPE) #, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     _, stderr = process.communicate()
     
     end_time = time.time()
@@ -70,14 +73,14 @@ def execute_command(command: str) -> Tuple[float, float, int, int, bytes]:
     
     return execution_time, cpu_time, memory_usage, process.returncode, stderr
 
-def run_esc_gnn(dataset: str, output_folder: str) -> None:
-    commands = generate_esc_commands(dataset)
+def run_i2_gnn(dataset: str, output_folder: str) -> None:
+    commands = generate_i2_commands(dataset)
     results = []
-    model_output_folder = os.path.join(output_folder, dataset, "ESC-GNN")
+    model_output_folder = os.path.join(output_folder, dataset, EXP_CONFIG["model"][0])
     os.makedirs(model_output_folder, exist_ok=True)
 
-    for cmd in tqdm(commands, desc=f"Running ESC-GNN on {dataset}", unit="command"):
-        execution_time, cpu_time, memory_usage, return_code, stderr = execute_command(cmd)
+    for cmd in tqdm(commands, desc=f"Running {EXP_CONFIG['model'][0]} on {dataset}", unit="command"):
+        execution_time, cpu_time, memory_usage, return_code, std_err = execute_command(cmd)
         
         results.append({
             "command": cmd,
@@ -85,7 +88,7 @@ def run_esc_gnn(dataset: str, output_folder: str) -> None:
             "cpu_time": cpu_time,
             "memory_usage": memory_usage,
             "return_code": return_code,
-            "stderr": stderr.decode('utf-8')
+            "stderr": std_err.decode('utf-8')
         })
 
         result_file = os.path.join(model_output_folder, f"{dataset}_results.json")
@@ -149,14 +152,16 @@ def main() -> None:
     os.makedirs(output_folder, exist_ok=True)
 
     for dataset in DATASETS[0:1]:
-        run_esc_gnn(dataset, output_folder)
+        for model in MODELS:
+            EXP_CONFIG["model"] = [model]
+            run_i2_gnn(dataset, output_folder)
 
-        res_folder = os.path.join(output_folder, dataset, "ESC-GNN")
-        dataset_file = os.path.join("/workspace/code/ESC-GNN/data", dataset, "raw/dataset_compatible.pt")
-        try:
-            parse_results(res_folder, dataset_file, os.path.join(output_folder, dataset, "ESC-GNN"))
-        except Exception as e:
-            logger.error(f"Error processing results for {dataset} with ESC-GNN: {e}")
+            res_folder = os.path.join(output_folder, dataset, model)
+            dataset_file = os.path.join("/workspace/code/I2GNN/data", dataset, "raw/dataset_compatible.pt")
+            try:
+                parse_results(res_folder, dataset_file, os.path.join(output_folder, dataset, model))
+            except Exception as e:
+                logger.error(f"Error processing results for {dataset} with {model}: {e}")
 
 if __name__ == "__main__":
     main()

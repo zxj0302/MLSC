@@ -31,6 +31,8 @@ from utils_edge_efficient import create_subgraphs
 from sklearn.metrics import mean_absolute_error as MAE
 from modules.ppgn_modules import *
 from torch_geometric.utils import degree, dropout_adj, to_dense_batch, to_dense_adj
+import json
+
 
 times = {}
 
@@ -368,7 +370,9 @@ random.seed(args.seed)
 np.random.seed(args.seed)
 
 from dataloader import DataLoader  # use a custom dataloader to handle subgraphs
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+# device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+device = torch.device("cuda:1")
+torch.cuda.set_device(device)
 
 
 
@@ -379,9 +383,9 @@ args.res_dir = 'results/' + args.dataset + '_' + args.save_appendix
 if not os.path.exists(args.res_dir):
     os.makedirs(args.res_dir)
 # Backup python files.
-copy('run_graphcount.py', args.res_dir)
-copy('utils_edge_efficient.py', args.res_dir)
-copy('kernel/gin.py', args.res_dir)
+# copy('run_graphcount.py', args.res_dir)
+# copy('utils_edge_efficient.py', args.res_dir)
+# copy('kernel/gin.py', args.res_dir)
 # Save command line input.
 cmd_input = 'python ' + ' '.join(sys.argv) + '\n'
 with open(os.path.join(args.res_dir, 'cmd_input.txt'), 'a') as f:
@@ -599,13 +603,18 @@ def visualize(loader):
         np.save('./cpt/idgnn_random_node_2_std.npy', sigmas)
 
 def loop(start=1, best_val_error=None):
-    pbar = range(start, args.epochs+start)
+    pbar = tqdm(range(start, args.epochs+start), file=sys.stdout)
     count = 0
     start_time = time.time()
+    log = None
+    timestamp = time.strftime("%Y%m%d%H%M%S")
+    folder = f"/workspace/output/{args.dataset}/ESC-GNN/Checkpoints/{args.target}/{timestamp}"
+    os.makedirs(folder, exist_ok=True)
     for epoch in pbar:
-        # pbar.set_description('Epoch: {:03d}'.format(epoch))
+        pbar.set_description('Epoch: {:03d}'.format(epoch))
         lr = scheduler.optimizer.param_groups[0]['lr']
         loss = train(epoch)
+
         val_error = test(val_loader)
         scheduler.step(val_error)
         count += 1
@@ -615,17 +624,25 @@ def loop(start=1, best_val_error=None):
             test_error = test(test_loader)
             best_val_error = val_error
             count = 0
-            log = (
-                    'Epoch: {:03d}, LR: {:7f}, Loss: {:.7f}, Validation MAE: {:.7f}, ' +
-                    'Test MAE: {:.7f}, Test MAE norm: {:.7f}'
-            ).format(
-                epoch, lr, loss, val_error,
-                test_error,
-                test_error / (std[target]).cuda(),
-            )
-            # # print('\n'+log+'\n')
-            with open(os.path.join(args.res_dir, 'log.txt'), 'a') as f:
-                f.write(log + '\n')
+            # log = (
+            #         'Epoch: {:03d}, LR: {:7f}, Loss: {:.7f}, Validation MAE: {:.7f}, ' +
+            #         'Test MAE: {:.7f}, Test MAE norm: {:.7f}'
+            # ).format(
+            #     epoch, lr, loss, val_error,
+            #     test_error,
+            #     test_error / (std[target]).cuda(),
+            # )
+            # # # print('\n'+log+'\n')
+            # with open(os.path.join(args.res_dir, 'log.txt'), 'a') as f:
+            #     f.write(log + '\n')
+        if epoch % 100 == 0 or epoch == args.epochs:
+            model_name = os.path.join(folder, "cpt_{}.pth".format(epoch))
+            # print(f"Saving model to {model_name}")
+            torch.save(model.state_dict(), model_name)
+            # save args config to a json file
+            with open(os.path.join(folder, "args.json"), "w") as f:
+                json.dump(vars(args), f)
+
     result = {}
     times['training'] = time.time() - start_time
     
@@ -639,13 +656,16 @@ def loop(start=1, best_val_error=None):
     result['Prediction'] = y_pred
     result['Ground-Truth'] = y_true
     # write the results to a json file
-    import json
-    with open(os.path.join(f"/workspace/output/{args.dataset}/ESC-GNN", f'target_{args.target}.json'), 'w') as f:
+    
+    folder = f"/workspace/output/{args.dataset}/ESC-GNN"
+    # if not os.path.exists(folder):
+    os.makedirs(folder, exist_ok=True)
+    with open(os.path.join(folder, f'target_{args.target}.json'), 'w') as f:
         json.dump(result, f)
 
-    model_name = os.path.join(args.res_dir, 'model_checkpoint{}.pth'.format(epoch))
-    torch.save(model.state_dict(), model_name)
-    start = epoch + 1
+    # model_name = os.path.join(args.res_dir, 'model_checkpoint{}.pth'.format(epoch))
+    # torch.save(model.state_dict(), model_name)
+    # start = epoch + 1
     return start, best_val_error, log
 
 

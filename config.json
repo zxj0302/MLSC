@@ -113,7 +113,7 @@
     "algorithms": [
         {
             "name": "DeSCo",
-            "skip": false,
+            "skip": true,
             "container_config": {
                 "image": "zhuxiangju/benchmark_subgraphcounting:DeSCo_LINUX",
                 "name": "DeSCo_EXP",
@@ -190,7 +190,7 @@
         },
         {
             "name": "ESC-GNN",
-            "skip": false,
+            "skip": true,
             "container_config": {
                 "image": "zhuxiangju/benchmark_subgraphcounting:ESC-GNN_LINUX",
                 "name": "ESC_EXP",
@@ -198,10 +198,10 @@
                 "tty": true,
                 "stdin_open": true,
                 "volumes": {
-                    "/home/zxj/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
+                    "/userhome/matin/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
                 },
                 "ipc_mode": "host",
-                "cpuset_cpus": "0-15",
+                "cpuset_cpus": "0-47",
                 "device_requests": [{"Driver": "", "Count": -1, "DeviceIDs": null, "Capabilities": [["gpu"]], "Options": null}]
             },
             "command": [
@@ -211,8 +211,23 @@
         },
         {
             "name": "I2GNN",
-            "skip": true,
-            "container_config": {}
+            "skip": false,
+            "container_config":{
+                    "image": "zhuxiangju/benchmark_subgraphcounting:ESC-GNN_LINUX",
+                    "name": "I2GNN_EXP2",
+                    "detach": true,
+                    "tty": true,
+                    "stdin_open": true,
+                    "volumes": {
+                        "/userhome/matin/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
+                    },
+                    "ipc_mode": "host",
+                    "cpuset_cpus": "0-47",
+                    "device_requests": [{"Driver": "", "Count": -1, "DeviceIDs": null, "Capabilities": [["gpu"]], "Options": null}]
+                },
+                "command": [
+                    "docker", "exec", "-it", "I2GNN_EXP2", "bash", "-ilc", "cd /workspace/code/I2GNN && conda activate ESC-GNN && python i2_run.py /workspace/input /workspace/output"
+                ]
         },
         {
             "name": "LPP",

@@ -11,3 +11,27 @@ Exception handling: We deem the OOM and RuntimeError as Failure. For the OOM, we
 
 
 !NOTE: If dataset Set_{i} is changed, delete all the processed data in I2GNN and ESC-GNN to update!
+
+5. issues with ESC-GNN(family):
+    - batch size issue
+        - they fail (run out of memory) when we set the batch size to their default value(256) for most targets and Datasets
+        -  possible solutions:
+            - reduce the batch size to 128, 64, 32, 16, 8, 4, 2, 1
+            - use the default batch size for the targets and Datasets that can handle it and report the failure for the others
+    - hard-coded degree size:
+        - they fail when the degree size is larger than 200
+        - possible solutions:
+            - set a larger degree size (how large?)
+            - report failure
+    - running time:
+        - they take a long time to run
+        - possible solutions:
+            - on our server:
+                - report the running time with the default parameters
+                - use a smaller datasets
+                - use less datasets
+                - use a smaller number of epochs (impact on the accuracy)
+                - use a smaller number of layers (impact on the accuracy)
+                - use a smaller number of hops (impact on the accuracy)
+            - rent a more powerful servers online and run in parallel:
+                - takes thousands of dollars (4-8K HKD)
