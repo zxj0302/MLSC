@@ -12,20 +12,27 @@ from typing import List, Tuple, Dict
 from tqdm import tqdm
 
 # Constants
-MODELS = ["GNN"] # "PPGN", "GNN",, "PPGN" "IDGNN", , "GNNAK"
+MODELS = ["PPGN"] # "PPGN", "GNN",, "PPGN" "IDGNN", , "GNNAK"
 ESCAPE_TARGET_DIAM = [2, 1,  2, 3, 2, 2, 2, 1,   2, 3, 4, 2, 3, 2, 3, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
 TARGET_DIAM =        [2, 1,  3, 2, 2, 2, 2, 1,   4, 3, 2, 3, 3, 2, 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
+
 # BATCH_SIZE = [16, 32, 128, 256]
-BATCH_SIZE = [256, 256, 256, 256]
+BATCH_SIZE = {
+    "GNN":[256, 256, 256, 256],
+    "PPGN":[1, 2, 2, 2],
+    "GNNAK":[2, 4, 4, 8],
+    "IDGNN":[2, 4, 4, 8],
+    "I2GNN":[1, 2, 4, 4]
+    }
 
 # Datasets
-DATASETS = ["data_esc"]+ [f"Set_{i}" for i in range(9, 11)]
+DATASETS = ["Set_1"]
 
 # Configuration
 EXP_CONFIG = {
     "h": [3],
     "batch_size": [128],
-    "target": [7, 10, 8, 15], # 7,10 list(range(29)), # [0, 1, 3, 10],
+    "target": [11], # 7,10 list(range(29)), # [0, 1, 3, 10],
     "model": MODELS,
     "dataset": "data_esc", #[f"Set_{i}" for i in range(1, 2)],
     "lr": [0.001],
@@ -52,7 +59,7 @@ def generate_i2_commands(dataset: str) -> List[str]:
     ))
 
     return [
-        f"{base_command} --batch_size {BATCH_SIZE[-TARGET_DIAM[p[1]]]} --target {p[1]} --model {p[2]} "
+        f"{base_command} --batch_size {BATCH_SIZE[p[2]][-TARGET_DIAM[p[1]]]} --target {p[1]} --model {p[2]} "
         f"--h {TARGET_DIAM[p[1]]} --lr {p[4]} --epoch 2000 --dataset {p[6]}"
         for p in param_combinations
     ]
@@ -76,7 +83,7 @@ def execute_command(command: str) -> Tuple[float, float, int, int]:
 def run_i2_gnn(dataset: str, output_folder: str) -> None:
     commands = generate_i2_commands(dataset)
     results = []
-    model_output_folder = os.path.join(output_folder, dataset, EXP_CONFIG["model"][0])
+    model_output_folder = os.path.join(output_folder, "retrain", dataset, EXP_CONFIG["model"][0])
     os.makedirs(model_output_folder, exist_ok=True)
 
     for cmd in tqdm(commands, desc=f"Running {EXP_CONFIG['model'][0]} on {dataset}", unit="command"):
@@ -151,7 +158,7 @@ def main() -> None:
     
     os.makedirs(output_folder, exist_ok=True)
 
-    for dataset in DATASETS[0:1]:
+    for dataset in DATASETS:
         for model in MODELS:
             EXP_CONFIG["model"] = [model]
             run_i2_gnn(dataset, output_folder)

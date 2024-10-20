@@ -101,7 +101,8 @@ def plot_sampled(plot_config):
     # TODO: parameterize more
     sample_path = plot_config['sample_path']
     pattern_index = [3, 6, 7, 14, 13, 16, 15, 17, 18, 31, 30, 29, 35, 36, 34, 38, 37, 40, 42, 41, 44, 43, 46, 45, 47, 48, 49, 50, 51, 52]
-    for dataset_name in tqdm([entry.name for entry in os.scandir(sample_path) if entry.is_dir()], desc='plotting sampled datasets'):
+    # for dataset_name in tqdm([entry.name for entry in os.scandir(sample_path) if entry.is_dir()], desc='plotting sampled datasets'):
+    for dataset_name in ['Set_1', 'Set_2', 'Set_3', 'Set_4', 'Set_5']:
         dataset = torch.load(os.path.join(sample_path, dataset_name, 'dataset.pt'))
         fig, axes = plt.subplots(5, 6, figsize=(30, 24))
         axes = axes.flatten()

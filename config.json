@@ -124,8 +124,8 @@
                     "/home/zxj/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
                 },
                 "ipc_mode": "host",
-                "cpuset_cpus": "0-15",
-                "device_requests": [{"Driver": "", "Count": -1, "DeviceIDs": null, "Capabilities": [["gpu"]], "Options": null}]
+                "cpuset_cpus": "0-31",
+                "device_requests": [{"Driver": "", "DeviceIDs": ["1"], "Capabilities": [["gpu"]], "Options": null}]
             },
             "command": [
                 "docker", "exec", "-it", "DeSCo_EXP", "bash", "-ilc", "cd /workspace/code/DeSCo && conda activate DeSCo && python desco_run.py /workspace/input /workspace/output"
@@ -190,7 +190,7 @@
         },
         {
             "name": "ESC-GNN",
-            "skip": true,
+            "skip": false,
             "container_config": {
                 "image": "zhuxiangju/benchmark_subgraphcounting:ESC-GNN_LINUX",
                 "name": "ESC_EXP",
@@ -198,11 +198,11 @@
                 "tty": true,
                 "stdin_open": true,
                 "volumes": {
-                    "/userhome/matin/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
+                    "/home/zxj/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
                 },
                 "ipc_mode": "host",
-                "cpuset_cpus": "0-47",
-                "device_requests": [{"Driver": "", "Count": -1, "DeviceIDs": null, "Capabilities": [["gpu"]], "Options": null}]
+                "cpuset_cpus": "0-15",
+                "device_requests": [{"Driver": "", "DeviceIDs": ["0"], "Capabilities": [["gpu"]], "Options": null}]
             },
             "command": [
                 "docker", "exec", "-it", "ESC_EXP", "bash", "-ilc", "cd /workspace/code/ESC-GNN && conda activate ESC-GNN && python esc_run.py /workspace/input /workspace/output"
@@ -211,22 +211,22 @@
         },
         {
             "name": "I2GNN",
-            "skip": false,
+            "skip": true,
             "container_config":{
                     "image": "zhuxiangju/benchmark_subgraphcounting:ESC-GNN_LINUX",
-                    "name": "I2GNN_EXP2",
+                    "name": "I2GNN_EXP",
                     "detach": true,
                     "tty": true,
                     "stdin_open": true,
                     "volumes": {
-                        "/userhome/matin/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
+                        "/home/zxj/Dev/MLSC": {"bind": "/workspace", "mode": "rw"}
                     },
                     "ipc_mode": "host",
-                    "cpuset_cpus": "0-47",
-                    "device_requests": [{"Driver": "", "Count": -1, "DeviceIDs": null, "Capabilities": [["gpu"]], "Options": null}]
+                    "cpuset_cpus": "0-15",
+                    "device_requests": [{"Driver": "", "DeviceIDs": ["0"], "Capabilities": [["gpu"]], "Options": null}]
                 },
                 "command": [
-                    "docker", "exec", "-it", "I2GNN_EXP2", "bash", "-ilc", "cd /workspace/code/I2GNN && conda activate ESC-GNN && python i2_run.py /workspace/input /workspace/output"
+                    "docker", "exec", "-it", "I2GNN_EXP", "bash", "-ilc", "cd /workspace/code/I2GNN && conda activate ESC-GNN && python i2_run.py /workspace/input /workspace/output"
                 ]
         },
         {

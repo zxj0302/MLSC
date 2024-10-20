@@ -208,6 +208,9 @@ def parse_neighborhood(parser, arg_str=None) -> list[argparse._StoreAction]:
         "--depth", type=int, help="depth of the canonical neighborhood"
     )
     enc_parser.add_argument(
+        "--target", type=int, help="pattern target"
+    )
+    enc_parser.add_argument(
         "--use_hetero", action="store_true", help="whether to use heterogeneous GNNs"
     )
     enc_parser.add_argument(
@@ -250,7 +253,7 @@ def parse_neighborhood(parser, arg_str=None) -> list[argparse._StoreAction]:
         neigh_input_dim=1,
         neigh_hidden_dim=64,
         neigh_dropout=0.0,
-        neigh_model_path="ckpt/DeSCo/Syn_1827/neigh",
+        neigh_model_path="ckpt/neigh",
         neigh_epoch_num=300,
         neigh_batch_size=512,
         depth=4,
@@ -314,7 +317,7 @@ def parse_gossip(parser, arg_str=None) -> list[argparse._StoreAction]:
         gossip_layer_num=2,
         gossip_hidden_dim=64,
         gossip_dropout=0.01,
-        gossip_model_path="ckpt/DeSCo/Syn_1827/gossip",
+        gossip_model_path="ckpt/gossip",
         gossip_epoch_num=30,
         gossip_batch_size=256,
         gossip_lr=1e-3,

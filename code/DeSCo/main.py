@@ -243,9 +243,21 @@ def main(
     neighborhood_checkpoint_callback = ModelCheckpoint(
         monitor="neighborhood_counting_val_loss",
         mode="min",
-        save_top_k=1,
+        save_top_k=-1,
         save_last=True,
     )
+    # neighborhood_epoch_checkpoint_callback = ModelCheckpoint(
+    #     save_top_k=-1,  # Save all checkpoints
+    #     save_last=True,
+    #     filename='neighborhood_{epoch}',
+    # )
+
+    # neighborhood_best_checkpoint_callback = ModelCheckpoint(
+    #     monitor="neighborhood_counting_val_loss",
+    #     mode="min",
+    #     save_top_k=1,
+    #     filename='neighborhood_best',
+    # )
     neighborhood_trainer = pl.Trainer(
         max_epochs=args_neighborhood.epoch_num,
         accelerator="gpu",
@@ -304,7 +316,7 @@ def main(
                 model=neighborhood_model,
                 datamodule=neighborhood_dataloader,
             )
-        neighborhood_best_model_path = neighborhood_checkpoint_callback.best_model_path
+        neighborhood_best_model_path = neighborhood_checkpoint_callback.last_model_path
         print("best neighborhood model path: ", neighborhood_best_model_path)
         logger.write('Best Neighborhood Model Path: ' + neighborhood_best_model_path)
         neighborhood_model = NeighborhoodCountingModel.load_from_checkpoint(
@@ -399,8 +411,20 @@ def main(
     if not skip_gossip:
         gossip_model.set_query_emb(neighborhood_model.get_query_emb())
         gossip_checkpoint_callback = ModelCheckpoint(
-            monitor="gossip_counting_val_loss", mode="min", save_top_k=1, save_last=True
+            monitor="gossip_counting_val_loss", mode="min", save_top_k=-1, save_last=True
         )
+        # gossip_epoch_checkpoint_callback = ModelCheckpoint(
+        #     save_top_k=-1,
+        #     save_last=True,
+        #     filename='gossip_{epoch}',
+        # )
+
+        # gossip_best_checkpoint_callback = ModelCheckpoint(
+        #     monitor="gossip_counting_val_loss",
+        #     mode="min",
+        #     save_top_k=1,
+        #     filename='gossip_best',
+        # )
         gossip_trainer = pl.Trainer(
             max_epochs=args_gossip.epoch_num,
             accelerator="gpu",
@@ -438,7 +462,7 @@ def main(
                 model=gossip_model,
                 datamodule=gossip_dataloader,
             )
-        gossip_best_model_path = gossip_checkpoint_callback.best_model_path
+        gossip_best_model_path = gossip_checkpoint_callback.last_model_path
         print("best gossip model path: ", gossip_best_model_path)
         logger.write('Best Gossip Model Path: ' + gossip_best_model_path)
         gossip_model = GossipCountingModel.load_from_checkpoint(gossip_best_model_path)
@@ -655,7 +679,8 @@ if __name__ == "__main__":
     gossip_checkpoint = args_opt.gossip_checkpoint
 
     # define the query graphs
-    query_ids = gen_query_ids(query_size=[3, 4, 5])
+    query_ids = gen_query_ids(query_size=[3, 4, 5])[args_neighborhood.target: (args_neighborhood.target + 1)]
+    # query_ids = [18, 29, 31, 37, 38]
     # query_ids = [6]
     nx_queries = [nx.graph_atlas(i) for i in query_ids]
     if args_neighborhood.use_node_feature:
@@ -673,7 +698,7 @@ if __name__ == "__main__":
 
     # define the output directory
     if args_opt.output_dir is None:
-        output_dir = "results/wdsm24/raw"
+        output_dir = "results/"
         time = datetime.datetime.now().strftime("%Y%m%d_%H:%M:%S")
         output_dir = os.path.join(output_dir, time)
     else:

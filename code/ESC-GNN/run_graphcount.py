@@ -371,7 +371,7 @@ np.random.seed(args.seed)
 
 from dataloader import DataLoader  # use a custom dataloader to handle subgraphs
 # device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-device = torch.device("cuda:1")
+device = torch.device("cuda:0")
 torch.cuda.set_device(device)
 
 
@@ -452,9 +452,9 @@ y_train_val = torch.cat([train_dataset.data.y, val_dataset.data.y], dim=0)
 mean = y_train_val.mean(dim=0)
 std = y_train_val.std(dim=0)
 
-train_dataset.data.y = (train_dataset.data.y - mean) / std
-val_dataset.data.y = (val_dataset.data.y - mean) / std
-test_dataset.data.y = (test_dataset.data.y - mean) / std
+# train_dataset.data.y = (train_dataset.data.y - mean) / std
+# val_dataset.data.y = (val_dataset.data.y - mean) / std
+# test_dataset.data.y = (test_dataset.data.y - mean) / std
 
 # print('Mean = %.3f, Std = %.3f' % (mean[args.target], std[args.target]))
 times['normalize_target'] = time.time() - start
@@ -542,8 +542,10 @@ def test(loader, output=False):
             num += y.size(0)
             if output:
                 # Denormalize
-                y_pred.extend(((y_hat * std[args.target] + mean[args.target]).cpu().numpy()).tolist())
-                y_true.extend(((y * std[args.target] + mean[args.target]).cpu().numpy()).tolist())
+                # y_pred.extend(((y_hat * std[args.target] + mean[args.target]).cpu().numpy()).tolist())
+                # y_true.extend(((y * std[args.target] + mean[args.target]).cpu().numpy()).tolist())
+                y_pred.extend((y_hat.cpu().numpy()).tolist())
+                y_true.extend((y.cpu().numpy().tolist()))
     if output:
         return y_pred, y_true
     return error / num * (std[args.target])
@@ -608,7 +610,7 @@ def loop(start=1, best_val_error=None):
     start_time = time.time()
     log = None
     timestamp = time.strftime("%Y%m%d%H%M%S")
-    folder = f"/workspace/output/{args.dataset}/ESC-GNN/Checkpoints/{args.target}/{timestamp}"
+    folder = f"/workspace/output/retrain/{args.dataset}/ESC-GNN/Checkpoints/{args.target}/{timestamp}"
     os.makedirs(folder, exist_ok=True)
     for epoch in pbar:
         pbar.set_description('Epoch: {:03d}'.format(epoch))
@@ -635,7 +637,7 @@ def loop(start=1, best_val_error=None):
             # # # print('\n'+log+'\n')
             # with open(os.path.join(args.res_dir, 'log.txt'), 'a') as f:
             #     f.write(log + '\n')
-        if epoch % 100 == 0 or epoch == args.epochs:
+        if epoch <= args.epochs:
             model_name = os.path.join(folder, "cpt_{}.pth".format(epoch))
             # print(f"Saving model to {model_name}")
             torch.save(model.state_dict(), model_name)
@@ -653,11 +655,11 @@ def loop(start=1, best_val_error=None):
     times['inference'] = time.time() - start_time
     result['time_profile'] = times
 
-    result['Prediction'] = y_pred
-    result['Ground-Truth'] = y_true
+    result['predictions'] = y_pred
+    result['ground_truth'] = y_true
     # write the results to a json file
     
-    folder = f"/workspace/output/{args.dataset}/ESC-GNN"
+    folder = f"/workspace/output/retrain/{args.dataset}/ESC-GNN"
     # if not os.path.exists(folder):
     os.makedirs(folder, exist_ok=True)
     with open(os.path.join(folder, f'target_{args.target}.json'), 'w') as f:

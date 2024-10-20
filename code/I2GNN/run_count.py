@@ -327,7 +327,7 @@ def loop(start=1, best_val_error=None):
     log = None
     count = 0
     timestamp = time.strftime("%Y%m%d%H%M%S")
-    folder = f"/workspace/output/{args.dataset}/{args.model}/Checkpoints/{args.target}/{timestamp}"
+    folder = f"/workspace/output/runtime/{args.dataset}/{args.model}/Checkpoints/{args.target}/{timestamp}"
     os.makedirs(folder, exist_ok=True)
     for epoch in pbar:
         pbar.set_description("Epoch: {:03d}".format(epoch))
@@ -342,28 +342,13 @@ def loop(start=1, best_val_error=None):
             # test_error = test(test_loader)
             best_val_error = val_error
             count = 0
-            # log = (
-            #     "Epoch: {:03d}, LR: {:7f}, Loss: {:.7f}, Validation MAE: {:.7f}, "
-            #     + "Test MAE: {:.7f}, Test MAE norm: {:.7f}"
-            # ).format(
-            #     epoch,
-            #     lr,
-            #     loss,
-            #     val_error,
-            #     test_error,
-            #     test_error / (std[target]).cuda(),
-            # )
-            # print('\n'+log+'\n')
-            # with open(os.path.join(args.res_dir, "log.txt"), "a") as f:
-            #     f.write(log + "\n")
-
             #  save the model
-        if epoch % 100 == 0 or epoch == args.epochs:
+        if epoch % 10 == 0 or epoch == args.epochs:
             model_name = os.path.join(folder, "cpt_{}.pth".format(epoch))
             torch.save(model.state_dict(), model_name)
             # save args config to a json file
             with open(os.path.join(folder, "args.json"), "w") as f:
-                json.dump(vars(args), f)
+                json.dump(vars(args), f, indent=2)
 
         pbar.set_postfix({'Loss': f'{loss:.4f}', 'Val Error': f'{val_error:.4f}'})
         pbar.update()
@@ -377,14 +362,14 @@ def loop(start=1, best_val_error=None):
     times["inference"] = time.time() - start
     result["time_profile"] = times
 
-    result["Prediction"] = y_pred
-    result["Ground-Truth"] = y_true
+    result["predictions"] = y_pred
+    result["ground_truth"] = y_true
     # write the results to a json file
-    folder = f"/workspace/output/{args.dataset}/{args.model}"
-    if not os.path.exists(folder):
-        os.makedirs(folder)
+    folder = f"/workspace/output/runtime/{args.dataset}/{args.model}"
+    os.makedirs(folder, exist_ok=True)
+
     with open(os.path.join(folder, f"target_{args.target}.json"), "w") as f:
-        json.dump(result, f)
+        json.dump(result, f, indent=2)
 
     return start, best_val_error, log
 

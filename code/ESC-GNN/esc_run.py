@@ -12,17 +12,17 @@ from typing import List, Tuple, Dict
 from tqdm import tqdm
 
 # Constants
-TARGET_DIAM = [2, 1, 2, 3, 2, 2, 2, 1, 2, 3, 4, 2, 3, 2, 3, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
+TARGET_DIAM = [2, 1,  3, 2, 2, 2, 2, 1,   4, 3, 2, 3, 3, 2, 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
 BATCH_SIZE = [128, 128, 128, 128]
 
 # Datasets
-DATASETS = ["data_esc"] + [f"Set_{i}" for i in range(9, 11)]
+DATASETS =  [f"Set_{i}" for i in range(1, 2)]
 
 # Configuration
 EXP_CONFIG = {
     "h": [3],
     "batch_size": [128],
-    "target": list(range(29)),
+    "target": [11],
     "dataset": "data_esc",
     "lr": [1e-2],
     "layers": [3],
@@ -73,7 +73,7 @@ def execute_command(command: str) -> Tuple[float, float, int, int, bytes]:
 def run_esc_gnn(dataset: str, output_folder: str) -> None:
     commands = generate_esc_commands(dataset)
     results = []
-    model_output_folder = os.path.join(output_folder, dataset, "ESC-GNN")
+    model_output_folder = os.path.join(output_folder, "retrain", dataset, "ESC-GNN")
     os.makedirs(model_output_folder, exist_ok=True)
 
     for cmd in tqdm(commands, desc=f"Running ESC-GNN on {dataset}", unit="command"):
@@ -148,10 +148,10 @@ def main() -> None:
     
     os.makedirs(output_folder, exist_ok=True)
 
-    for dataset in DATASETS[0:1]:
+    for dataset in DATASETS:
         run_esc_gnn(dataset, output_folder)
 
-        res_folder = os.path.join(output_folder, dataset, "ESC-GNN")
+        res_folder = os.path.join(output_folder, "runtime", dataset, "ESC-GNN")
         dataset_file = os.path.join("/workspace/code/ESC-GNN/data", dataset, "raw/dataset_compatible.pt")
         try:
             parse_results(res_folder, dataset_file, os.path.join(output_folder, dataset, "ESC-GNN"))

@@ -163,6 +163,6 @@ class dataset_random_graph(InMemoryDataset):
                 data_list = [data for data in data_list if self.pre_filter(data)]
             print('pre-transforming for data at '+save_path)
             if self.pre_transform is not None:
-                data_list = [self.pre_transform(data) for data in tqdm(data_list)]
+                data_list = [self.pre_transform(data) for data in tqdm(data_list, desc='Pre-processing', file=sys.stdout)]
             data, slices = self.collate(data_list)
             torch.save((data, slices), save_path)

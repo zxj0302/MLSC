@@ -14,12 +14,21 @@ import data_processing as dp
 from utils import create_subgraphs, create_subgraphs2
 
 
-def load_model_from_checkpoint(checkpoint_dir):
+def load_model_from_checkpoint(checkpoint_dir, cpt=100):
     """
     Load a model from a checkpoint directory containing args.json and cpt_2000.pth.
     """
+    # find the folder name with the highest timestamp
+    folder_names = os.listdir(checkpoint_dir)
+    # sort the folder names by timestamp
+    folder_names.sort()
+    if len(folder_names) == 0:
+        raise FileNotFoundError(f"No checkpoint folder found in {checkpoint_dir}")
+    # checkpoint_dir = os.path.join(checkpoint_dir, folder_names[-1])
+
+
     args_path = os.path.join(checkpoint_dir, "finetuned_args.json")
-    checkpoint_path = os.path.join(checkpoint_dir, "finetuned_500.pth")
+    checkpoint_path = os.path.join(checkpoint_dir, f"finetuned_{cpt}.pth")
 
     if not os.path.exists(args_path):
         raise FileNotFoundError(
@@ -60,15 +69,17 @@ def load_model_from_checkpoint(checkpoint_dir):
     return model, args
 
 
-def MyTransform(data):
-    data.y = data.y[:, int(args.target)]
-    return data
+
 
 
 def load_dataset(args, dataset_name, split="test"):
     """
     Load and preprocess a dataset.
     """
+    def MyTransform(data):
+        data.y = data.y[:, int(args.target)]
+        return data
+
     def pre_transform(g):
         return create_subgraphs(
             g,
@@ -131,7 +142,7 @@ def test(loader, model, args, device, mean, std, output=False):
             y_hat = model(data)[:, 0]
             print(y.shape, y_hat.shape)
             # Denormalize
-            y_hat = y_hat * std[args.target] + mean[args.target]
+            # y_hat = y_hat * std[args.target] + mean[args.target]
 
             error += torch.sum(torch.abs(y_hat - y)).item()
             if output:
@@ -150,9 +161,10 @@ def run_test_on_dataset(model, args, dataset_name):
     Run test on a given dataset using the loaded model.
     """
     dataset = load_dataset(args, dataset_name)
-    test_loader = DataLoader(dataset, batch_size=args.batch_size)
+    print("batch size: ", args.batch_size)
+    test_loader = DataLoader(dataset, batch_size=16)
 
-    device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
 
     print(f"Running test on {len(test_loader.dataset)} samples...")
@@ -174,36 +186,63 @@ def run_test_on_dataset(model, args, dataset_name):
     return {"mae": mae, "gt_mean": gt_mean, "gt_std": gt_std, "pred_mean": pred_mean, "pred_std": pred_std, "predictions": y_pred, "ground_truth": y_true}
 
 
+def finetuned_on_all_datasets():
+    models = ["GNN", "GNNAK"]
+    TARGET = 13
+    datasets = ["Set_2", "Set_3", "Set_5"]
+    for m in models[-1:]:
+        for dataset in datasets[:2]:
+            # "/home/zxj/Dev/MLSC/output/final_fine/Set_2"
+            checkpoint_dir = f"/workspace/output/final_fine/{dataset}/{m}/{TARGET}"
+            print(f"Loading model from checkpoint: {checkpoint_dir}")
+            model, args = load_model_from_checkpoint(checkpoint_dir, cpt=300)
+            print(f"Model loaded: {type(model).__name__}")
+
+            test_dataset_name = dataset  # Replace with your actual test dataset name
+            print(f"Running test on dataset: {test_dataset_name}")
+            test_results = run_test_on_dataset(model, args, test_dataset_name)
+
+            print(f"Test Results:")
+            print(f"  MAE: {test_results['mae']}")
+            print(f"  Number of samples: {len(test_results['predictions'])}")
+
+            # Optionally, save the results to a file
+            output_dir = f"output/fine/{test_dataset_name}/{m}/13"
+            os.makedirs(output_dir, exist_ok=True)
+            output_file = os.path.join(output_dir, f"{300}_cpt_test.json")
+            with open(output_file, "w") as f:
+                json.dump(test_results, f, indent=2)
+            print(f"Test results saved to: {output_file}")
+
+
+def main():
+    MODEL = "IDGNN"
+    TARGET = [7,8,10,14,15]
+    DATASET = "Set_1"
+    for t in TARGET:
+        for cpt in list(range(1, 251)):
+            # "/userhome/matin/Dev/MLSC/output/finetuned_models/PPGN/7"
+            checkpoint_dir = f"/workspace/output/finetuned_models/{MODEL}/{DATASET}/{t}"
+            print(f"Loading model from checkpoint: {checkpoint_dir}")
+            model, args = load_model_from_checkpoint(checkpoint_dir, cpt=cpt)
+            print(f"Model loaded: {type(model).__name__}")
+
+            test_dataset_name = DATASET  # Replace with your actual test dataset name
+            print(f"Running test on dataset: {test_dataset_name}")
+            test_results = run_test_on_dataset(model, args, test_dataset_name)
+
+            print(f"Test Results:")
+            print(f"  MAE: {test_results['mae']}")
+            print(f"  Number of samples: {len(test_results['predictions'])}")
+
+            # Optionally, save the results to a file
+            output_dir = f"output/fine/{test_dataset_name}/{MODEL}/{t}/"
+            os.makedirs(output_dir, exist_ok=True)
+            output_file = os.path.join(output_dir, f"{cpt}_cpt_test.json")
+            with open(output_file, "w") as f:
+                json.dump(test_results, f, indent=2)
+            print(f"Test results saved to: {output_file}")
+
 
 if __name__ == "__main__":
-    # SET_1 : Mean = 26.825, Std = 155.318
-    MODEL = "GNN"
-    TARGET = 2
-    SET = 0
-    # output/data_esc/GNNAK/Checkpoints/0/20241002040818
-    # /userhome/matin/Dev/MLSC/output/data_esc/GNN/Checkpoints/0/20241001181525
-    # "output/data_esc/I2GNN/Checkpoints/0/20241003062639"
-    # output/data_esc/I2GNN/Checkpoints/2/20241003082940
-    # output/data_esc/IDGNN/Checkpoints/2/20241005162119
-    # output/finetuned_models/GNN/0/Set_1/finetuned_500.pth
-    checkpoint_dir = f"/workspace/output/finetuned_models/{MODEL}/{TARGET}/Set_{SET}/"
-    print(f"Loading model from checkpoint: {checkpoint_dir}")
-    model, args = load_model_from_checkpoint(checkpoint_dir)
-    print(f"Model loaded: {type(model).__name__}")
-
-    test_dataset_name = "Set_3"  # Replace with your actual test dataset name
-    for test_dataset_name in [f"Set_{SET}"]: # "data_esc", "Set_1", "Set_2", "Set_3",
-        print(f"Running test on dataset: {test_dataset_name}")
-        test_results = run_test_on_dataset(model, args, test_dataset_name)
-
-        print(f"Test Results:")
-        print(f"  MAE: {test_results['mae']}")
-        print(f"  Number of samples: {len(test_results['predictions'])}")
-
-        # Optionally, save the results to a file
-        output_dir = "output"
-        os.makedirs(output_dir, exist_ok=True)
-        output_file = os.path.join(output_dir, f"fine_{test_dataset_name}_{MODEL}_{TARGET}_test_results.json")
-        with open(output_file, "w") as f:
-            json.dump(test_results, f, indent=2)
-        print(f"Test results saved to: {output_file}")
+    finetuned_on_all_datasets()

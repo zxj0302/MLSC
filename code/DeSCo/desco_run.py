@@ -10,13 +10,13 @@ import pandas as pd
 from datetime import datetime
 from torch_geometric.data import InMemoryDataset, Data
 
-column_exchange = [0, 1, 3, 2, 5, 4, 6, 7, 10, 9, 8, 13, 11, 12, 15, 14, 16, 18, 17, 20, 19, 22, 21, 23, 24, 25, 26, 27, 28]
+column_exchange = [0, 1, 3, 2, 5, 4, 6, 7, 10, 9, 8, 12, 13, 11, 15, 14, 16, 18, 17, 20, 19, 22, 21, 23, 24, 25, 26, 27, 28]
 
-def dataset_conversion(input_path, dataset_name):
+def dataset_conversion(input_path, dataset_name, target):
     sampled_data = torch.load(os.path.join(input_path, dataset_name, 'dataset.pt'))
     for split in ['train', 'val', 'test']:
         sampled_data_clean = [Data(edge_index=s.edge_index, x=torch.ones(s.num_nodes, 1)) for s in sampled_data[split]]
-        ground_truth = torch.cat([s.gt_induced_le5_desco for s in sampled_data[split]], dim=0)
+        ground_truth = torch.cat([s.gt_induced_le5_desco[:, [target]] for s in sampled_data[split]], dim=0)
         # check whether data/data_name exists, if not create it
         split_path = os.path.join('data', dataset_name, split)
         if os.path.exists(split_path):
@@ -25,7 +25,14 @@ def dataset_conversion(input_path, dataset_name):
         os.makedirs(os.path.join(split_path, 'raw'))
         os.makedirs(os.path.join(split_path, 'CanonicalCountTruth'))
         torch.save(InMemoryDataset.collate(sampled_data_clean), os.path.join(split_path, 'processed', 'rwd.pt'))
-        torch.save(ground_truth, os.path.join(split_path, 'CanonicalCountTruth', 'query_num_29_query_len_sum_135.pt'))
+        pattern_node = 0
+        if target <= 1:
+            pattern_node = 3
+        elif target <= 7:
+            pattern_node = 4
+        else:
+            pattern_node = 5
+        torch.save(ground_truth, os.path.join(split_path, 'CanonicalCountTruth', f'query_num_1_query_len_sum_{pattern_node}.pt'))
 
 def run_pretrained(output_folder, dataset_name):
     output_pretrained = os.path.abspath(os.path.join(output_folder, "pretrained"))
@@ -81,11 +88,18 @@ def run_pretrained(output_folder, dataset_name):
         with open(os.path.join(output_pretrained, 'error_run_command.txt'), 'w') as file:
             file.write(str(exit_code))
 
-def run_finetuned(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, neigh_batch_size, gossip_batch_size):
+def run_finetuned(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, neigh_batch_size, gossip_batch_size, target):
     output_finetuning = os.path.abspath(os.path.join(output_folder, "finetuning"))
     if os.path.exists(output_finetuning):
         os.system(f'rm -rf {output_finetuning}/*')
-    command_finetuning = f'python main.py --neigh_checkpoint ckpt/neighborhood_counting.ckpt --gossip_checkpoint ckpt/gossip_propagation.ckpt --train_dataset {dataset_name} --valid_dataset {dataset_name} --test_dataset {dataset_name} --train_neigh --train_gossip --test_gossip --output_path {output_finetuning} --neigh_epoch_num {neigh_epoch_num} --gossip_epoch_num {gossip_epoch_num} --neigh_batch_size {neigh_batch_size} --gossip_batch_size {gossip_batch_size}'
+    depth_map = {
+        0: 2,
+        1: 1,
+        3: 3,
+        10: 4
+    }
+    depth = depth_map[target]
+    command_finetuning = f'python main.py --neigh_checkpoint ckpt/neighborhood_counting.ckpt --gossip_checkpoint ckpt/gossip_propagation.ckpt --train_dataset {dataset_name} --valid_dataset {dataset_name} --test_dataset {dataset_name} --train_neigh --train_gossip --test_gossip --output_path {output_finetuning} --neigh_epoch_num {neigh_epoch_num} --gossip_epoch_num {gossip_epoch_num} --neigh_batch_size {neigh_batch_size} --gossip_batch_size {gossip_batch_size} --target {target} --depth {depth}'
     exit_code = os.system(command_finetuning)
     if exit_code == 0:
         # extract training time from fine-tuning
@@ -121,7 +135,7 @@ def run_finetuned(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num
             output_finetuned = os.path.abspath(os.path.join(output_folder, "finetuned"))
             if os.path.exists(output_finetuned):
                 os.system(f'rm -rf {output_finetuned}/*')
-            command_finetuned = f'python main.py --neigh_checkpoint {neigh_checkpoint_finetuned} --gossip_checkpoint {gossip_checkpoint_finetuned} --test_dataset {dataset_name} --test_gossip --output_path {output_finetuned}'
+            command_finetuned = f'python main.py --neigh_checkpoint {neigh_checkpoint_finetuned} --gossip_checkpoint {gossip_checkpoint_finetuned} --test_dataset {dataset_name} --test_gossip --output_path {output_finetuned} --target {target} --depth {depth}'
             exit_code = os.system(command_finetuned)
             if exit_code == 0:
                 # extract runtime from fine-tuned
@@ -267,25 +281,30 @@ def run_retrained(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num
 
 def main(input_path, output_path):
     # for all the folders named Set_i in the sampled_data_path folder, do the following:
-    for i in range(1, len([s for s in os.listdir(input_path) if re.match(r"Set_\d+$", s)]) + 1):
-        dataset_name = f'Set_{i}'
-        output_folder = os.path.join(output_path, dataset_name, 'DeSCo')
-        # change the directory
-        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    # all_data = [s for s in os.listdir(input_path) if re.match(r"Set_\d+$", s)]
+    all_data = ['Set_7', 'Set_8', 'Set_9', 'Set_10']
+    for dataset_name in all_data:
+        # dataset_name = f'Set_{i}'
+        for target in [0, 1, 3, 10]:
+            output_folder = os.path.join(output_path, dataset_name, 'DeSCo', str(target))
+            if not os.path.exists(output_folder):
+                os.makedirs(output_folder)
+            # change the directory
+            os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-        # 1. convert dataset to the needed format
-        dataset_conversion(input_path, dataset_name)
-        # 2. use the pretrained model to predict the output
-        run_pretrained(output_folder, dataset_name)
-        # 3. fine-tune the model
-        neigh_epoch_num = 300
-        gossip_epoch_num = 30
-        neigh_batch_size = 128
-        num_test_graph = len(torch.load(os.path.join(input_path, dataset_name, 'dataset.pt'))['test'])
-        gossip_batch_size = 32 if num_test_graph > 32 else 1
-        run_finetuned(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, neigh_batch_size, gossip_batch_size)
-        # 4. re-train the model
-        run_retrained(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, neigh_batch_size, gossip_batch_size)
+            # 1. convert dataset to the needed format
+            dataset_conversion(input_path, dataset_name, target)
+            # 2. use the pretrained model to predict the output
+            # run_pretrained(output_folder, dataset_name)
+            # 3. fine-tune the model
+            neigh_epoch_num = 10
+            gossip_epoch_num = 1
+            neigh_batch_size = 128
+            num_test_graph = len(torch.load(os.path.join(input_path, dataset_name, 'dataset.pt'))['test'])
+            gossip_batch_size = 32 if num_test_graph > 32 else 1
+            run_finetuned(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, neigh_batch_size, gossip_batch_size, target)
+            # 4. re-train the model
+            # run_retrained(output_folder, dataset_name, neigh_epoch_num, gossip_epoch_num, neigh_batch_size, gossip_batch_size)
 
 if __name__ == '__main__':
     input_path = sys.argv[1]

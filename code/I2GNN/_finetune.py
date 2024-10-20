@@ -21,10 +21,17 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-MODELS = ["GNNAK", "I2GNN", "PPGN", "IDGNN"] # "GNN", "GNNAK", "I2GNN", "PPGN", "IDGNN"
-NUM_EPOCHS = 500
+MODELS = ["GNN", "GNNAK"] # "GNN", "GNNAK", , "PPGN", "IDGNN"
+NUM_EPOCHS = 300
 NUM_TARGETS = 11
-BATCH_SIZE = 16
+BATCH_SIZE = {
+    "GNN":[256, 256, 256, 256],
+    "PPGN":[1, 2, 2, 2],
+    "GNNAK":[2, 4, 4, 8],
+    "IDGNN":[2, 4, 4, 8],
+    "I2GNN":[1, 2, 4, 4]
+    }
+TARGETS = [13]
 
 
 def load_model_from_checkpoint(checkpoint_dir):
@@ -130,7 +137,7 @@ def load_dataset(args, dataset_name, split="train"):
         def my_transform(data):
             data.y = data.y[:, args.target]
             return data
-
+        print(f"Running dataset_rg on {dataset_name} split {split}...")
         dataset = dp.dataset_random_graph(
             dataname=dataset_name,
             processed_name=processed_name,
@@ -138,14 +145,14 @@ def load_dataset(args, dataset_name, split="train"):
             pre_transform=my_pre_transform,
             split=split,
         )
+        print(f"Finished dataset_rg on dataset {dataset_name} split {split}")
         return dataset
 
     except Exception as e:
         logger.error(f"Error loading dataset: {str(e)}")
-        raise
 
 
-def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=200):
+def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=200, dataset_name="Set_00"):
     """
     Finetune the model on the given dataset with validation.
     """
@@ -162,12 +169,12 @@ def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=2
         )
 
         train_loader = DataLoader(
-            train_dataset, batch_size=BATCH_SIZE, shuffle=True
+            train_dataset, batch_size=BATCH_SIZE[args.model][-args.h], shuffle=True
         )
-        val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE)
+        val_loader = DataLoader(val_dataset, batch_size=BATCH_SIZE[args.model][-args.h])
 
         best_val_error = None
-        for epoch in tqdm(range(num_epochs), desc="Finetuning"):
+        for epoch in tqdm(range(1, num_epochs+1), desc="Finetuning"):
             # Training
             model.train()
             total_loss = 0
@@ -197,10 +204,12 @@ def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=2
 
             # Logging
             lr = scheduler.optimizer.param_groups[0]["lr"]
-            if (epoch + 1) % 25 == 0:
+            if epoch % 25 == 0:
                 logger.info(
-                    f"Epoch: {epoch+1:03d}, LR: {lr:.7f}, Loss: {avg_loss:.7f}, Validation MAE: {val_error:.7f}"
+                    f"Epoch: {epoch:03d}, LR: {lr:.7f}, Loss: {avg_loss:.7f}, Validation MAE: {val_error:.7f}"
                 )
+            if epoch <= NUM_EPOCHS:
+                save_model(model, args, f"/workspace/output/final_fine/{dataset_name}/{args.model}/{args.target}", args.target, epoch)
 
         return model
 
@@ -224,7 +233,7 @@ def test(loader, model, args, device):
     return error / len(loader.dataset)
 
 
-def save_model(model, args, save_dir, target):
+def save_model(model, args, save_dir, target, epoch=500):
     """
     Save the finetuned model.
     """
@@ -232,7 +241,7 @@ def save_model(model, args, save_dir, target):
         if not os.path.exists(save_dir):
             os.makedirs(save_dir)
 
-        save_path = os.path.join(save_dir, f"finetuned_{NUM_EPOCHS}.pth")
+        save_path = os.path.join(save_dir, f"finetuned_{epoch}.pth")
         torch.save(model.state_dict(), save_path)
 
         # Save updated args
@@ -295,19 +304,23 @@ def find_latest_timestamp_folder(base_path):
 
 
 def main():
-    base_save_dir = "/workspace/output/finetuned_models/"
-    device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+    base_save_dir = "/workspace/output/final_fine/"
+    os.makedirs(base_save_dir, exist_ok=True)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # device = torch.device("cuda")
 
     print(f"Using device: {device}")
 
     for mod in MODELS:
+        # if mod == "PPGN":
+        #     BATCH_SIZE = 4
+        # else:
+        #     BATCH_SIZE = 32
         base_checkpoint_dir = f"/workspace/output/data_esc/{mod}/Checkpoints"
-        for finetune_dataset_name in [f"Set_{i}" for i in range(0, 8)][:1]:
+        for finetune_dataset_name in ["Set_2", "Set_3", "Set_5"]:
             # finetune_dataset_name = "Set_1"  # Replace with your finetuning dataset name
-            for target in range(
-                NUM_TARGETS
-            ):  # Assuming 29 targets as in the original code
+            for target in TARGETS:  # Assuming 29 targets as in the original code
+                print(f"Processing target {target} with model {mod} on dataset {finetune_dataset_name}")
                 try:
                     target_checkpoint_dir = os.path.join(
                         base_checkpoint_dir, str(target)
@@ -340,13 +353,13 @@ def main():
                     val_dataset = load_dataset(args, finetune_dataset_name, split="val")
                     # test_dataset = load_dataset(args, finetune_dataset_name, split="test")
 
-                    y_train_val = torch.cat([train_dataset.data.y, val_dataset.data.y], dim=0)
-                    mean = y_train_val.mean(dim=0)
-                    std = y_train_val.std(dim=0)
-                    train_dataset.data.y = (train_dataset.data.y - mean) / std
-                    val_dataset.data.y = (val_dataset.data.y - mean) / std
+                    # y_train_val = torch.cat([train_dataset.data.y, val_dataset.data.y], dim=0)
+                    # mean = y_train_val.mean(dim=0)
+                    # std = y_train_val.std(dim=0)
+                    # train_dataset.data.y = (train_dataset.data.y - mean) / std
+                    # val_dataset.data.y = (val_dataset.data.y - mean) / std
                     # test_dataset.data.y = (test_dataset.data.y - mean) / std
-                    print("Mean = %.3f, Std = %.3f" % (mean[args.target], std[args.target]))
+                    # print("Mean = %.3f, Std = %.3f" % (mean[args.target], std[args.target]))
 
                     # Finetune model
                     finetuned_model = finetune_model(
@@ -356,18 +369,56 @@ def main():
                         val_dataset,
                         device,
                         num_epochs=NUM_EPOCHS,
+                        dataset_name=finetune_dataset_name,
                     )
 
                     # Save finetuned model
                     save_dir = os.path.join(
-                        base_save_dir, str(mod), str(target), finetune_dataset_name
+                        base_save_dir, finetune_dataset_name, str(mod), str(target)
                     )
-                    save_model(finetuned_model, args, save_dir, target)
+                    save_model(finetuned_model, args, save_dir, target, epoch=NUM_EPOCHS)
 
                 except Exception as e:
                     logger.error(f"Error processing target {target}: {str(e)}")
                     continue
 
+def dataset_load_time():
+    TARGET_DIAM = [2, 1,  3, 2, 2, 2, 2, 1,   4, 3, 2, 3, 3, 2, 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
+    import time
+    args_path = "/workspace/output/data_esc/GNN/Checkpoints/0/20241010212009/args.json"
+    with open(args_path, "r") as f:
+        saved_args = json.load(f)
+
+    # Create args object and populate it
+    args = type("Args", (), {})()
+    for key, value in saved_args.items():
+        setattr(args, key, value)
+
+    res = json.load(open("/workspace/output/load_time.json", "r"))
+    for dataset in [f"Set_{i}" for i in range(6, 11)]:
+        res[dataset] = {} if dataset not in res else res[dataset]
+        for alg in ["GNN", "IDGNN"]:
+            res[dataset][alg] = {} if alg not in res[dataset] else res[dataset][alg]
+            for target in [0,1,2,8]:
+                res[dataset][alg][target] = {} if target not in res[dataset][alg] else res[dataset][alg][target]
+                # update args
+                args.dataset = dataset
+                args.model = alg
+                args.target = target
+                args.h = TARGET_DIAM[target]
+                
+                for split in ["train", "val", "test"]:
+                    if split in res[dataset][alg][target]:
+                        continue
+                    print(f"Loading dataset {dataset} split {split}...")
+                    start = time.time()
+                    data = load_dataset(args, dataset, split=split)
+                    print(f"Loaded dataset {dataset} split {split} in {time.time() - start:.2f} seconds.")
+                    res[dataset][alg][target][split] = time.time() - start
+                    # save res
+                    with open(f"/workspace/output/load_time.json", "w") as f:
+                        json.dump(res, f, indent=2)
+
 
 if __name__ == "__main__":
-    main()
+    dataset_load_time()
