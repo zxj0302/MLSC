@@ -193,7 +193,7 @@
             "skip": false,
             "container_config": {
                 "image": "zhuxiangju/benchmark_subgraphcounting:ESC-GNN_LINUX",
-                "name": "ESC_EXP",
+                "name": "ESC_EXP1",
                 "detach": true,
                 "tty": true,
                 "stdin_open": true,
@@ -202,10 +202,10 @@
                 },
                 "ipc_mode": "host",
                 "cpuset_cpus": "0-15",
-                "device_requests": [{"Driver": "", "DeviceIDs": ["0"], "Capabilities": [["gpu"]], "Options": null}]
+                "device_requests": [{"Driver": "", "DeviceIDs": ["1"], "Capabilities": [["gpu"]], "Options": null}]
             },
             "command": [
-                "docker", "exec", "-it", "ESC_EXP", "bash", "-ilc", "cd /workspace/code/ESC-GNN && conda activate ESC-GNN && python esc_run.py /workspace/input /workspace/output"
+                "docker", "exec", "-it", "ESC_EXP1", "bash", "-ilc", "cd /workspace/code/ESC-GNN && conda activate ESC-GNN && python _evaluate.py"
             ]
             
         },

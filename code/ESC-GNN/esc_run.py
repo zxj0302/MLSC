@@ -151,7 +151,7 @@ def main() -> None:
     for dataset in DATASETS:
         run_esc_gnn(dataset, output_folder)
 
-        res_folder = os.path.join(output_folder, "runtime", dataset, "ESC-GNN")
+        res_folder = os.path.join(output_folder, "retrain", dataset, "ESC-GNN")
         dataset_file = os.path.join("/workspace/code/ESC-GNN/data", dataset, "raw/dataset_compatible.pt")
         try:
             parse_results(res_folder, dataset_file, os.path.join(output_folder, dataset, "ESC-GNN"))

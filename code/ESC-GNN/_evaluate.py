@@ -193,12 +193,12 @@ def load_model_from_checkpoint(checkpoint_dir, cpt=100):
     folder_names.sort()
     if len(folder_names) == 0:
         raise FileNotFoundError(f"No checkpoint folder found in {checkpoint_dir}")
-    # checkpoint_dir = os.path.join(checkpoint_dir, folder_names[-1])
+    checkpoint_dir = os.path.join(checkpoint_dir, folder_names[-1])
     print(checkpoint_dir)
 
 
-    args_path = os.path.join(checkpoint_dir, "finetuned_args.json")
-    checkpoint_path = os.path.join(checkpoint_dir, f"finetuned_{cpt}.pth")
+    args_path = os.path.join(checkpoint_dir, "args.json")
+    checkpoint_path = os.path.join(checkpoint_dir, f"cpt_{cpt}.pth")
 
     if not os.path.exists(args_path):
         raise FileNotFoundError(
@@ -228,8 +228,6 @@ def load_model_from_checkpoint(checkpoint_dir, cpt=100):
     model.eval()
 
     return model, args
-
-
 
 
 def load_dataset(args, dataset_name, split="test"):
@@ -369,29 +367,28 @@ def main():
     MODEL = "ESC-GNN"
     TARGET = [13]
     SET = 1
-    for t in TARGET:
-        for cpt in range(300,301):
-            # /home/zxj/Dev/MLSC/output/final_fine/Set_1/ESC-GNN/1/finetuned_300.pth
-            checkpoint_dir = f"/workspace/output/final_fine/Set_{SET}/ESC-GNN/{t}"
-            print(f"Loading model from checkpoint: {checkpoint_dir}")
-            model, args = load_model_from_checkpoint(checkpoint_dir, cpt=cpt)
-            print(f"Model loaded: {type(model).__name__}")
+    for cpt in range(100, 2001, 100):
+        # /home/zxj/Dev/MLSC/output/final_fine/Set_1/ESC-GNN/1/finetuned_300.pth
+        checkpoint_dir = f"/workspace/output/retrain/Set_1/ESC-GNN/Checkpoints/11"
+        print(f"Loading model from checkpoint: {checkpoint_dir}")
+        model, args = load_model_from_checkpoint(checkpoint_dir, cpt=cpt)
+        print(f"Model loaded: {type(model).__name__}")
 
-            test_dataset_name = "Set_1"  # Replace with your actual test dataset name
-            print(f"Running test on dataset: {test_dataset_name}")
-            test_results = run_test_on_dataset(model, args, test_dataset_name)
+        test_dataset_name = "Set_1"  # Replace with your actual test dataset name
+        print(f"Running test on dataset: {test_dataset_name}")
+        test_results = run_test_on_dataset(model, args, test_dataset_name)
 
-            print(f"Test Results:")
-            print(f"  MAE: {test_results['mae']}")
-            print(f"  Number of samples: {len(test_results['predictions'])}")
+        print(f"Test Results:")
+        print(f"  MAE: {test_results['mae']}")
+        print(f"  Number of samples: {len(test_results['predictions'])}")
 
-            # Optionally, save the results to a file
-            output_dir = f"output/fine/{test_dataset_name}/{MODEL}/{t}/"
-            os.makedirs(output_dir, exist_ok=True)
-            output_file = os.path.join(output_dir, f"{cpt}_cpt_test.json")
-            with open(output_file, "w") as f:
-                json.dump(test_results, f, indent=2)
-            print(f"Test results saved to: {output_file}")
+        # Optionally, save the results to a file
+        output_dir = f"output/retrain/{test_dataset_name}/{MODEL}/11/"
+        os.makedirs(output_dir, exist_ok=True)
+        output_file = os.path.join(output_dir, f"{cpt}_cpt_test.json")
+        with open(output_file, "w") as f:
+            json.dump(test_results, f, indent=2)
+        print(f"Test results saved to: {output_file}")
 
 
 

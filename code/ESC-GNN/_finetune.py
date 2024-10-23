@@ -43,7 +43,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 MODEL = "ESC-GNN"
-NUM_EPOCHS = 1000
+NUM_EPOCHS = 3000
 NUM_TARGETS = 29
 TARGETS = list(range(1,29))
 
@@ -210,10 +210,10 @@ def load_model_from_checkpoint(checkpoint_dir, cpt=2000):
         folder_names.sort()
         if len(folder_names) == 0:
             raise FileNotFoundError(f"No checkpoint folder found in {checkpoint_dir}")
-        checkpoint_dir = os.path.join(checkpoint_dir, folder_names[-1])
+        # checkpoint_dir = os.path.join(checkpoint_dir, folder_names[-1])
 
-        args_path = os.path.join(checkpoint_dir, "args.json")
-        checkpoint_path = os.path.join(checkpoint_dir, f"cpt_{cpt}.pth")
+        args_path = os.path.join(checkpoint_dir, "finetuned_args.json")
+        checkpoint_path = os.path.join(checkpoint_dir, f"finetuned_{cpt}.pth")
 
         if not os.path.exists(args_path):
             raise FileNotFoundError(f"args.json not found in the checkpoint directory: {args_path}")
@@ -308,7 +308,7 @@ def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=3
         print(f"Train size: {len(train_dataset)}, Val size: {len(val_dataset)}")
 
         best_val_error = None
-        for epoch in tqdm(range(1, num_epochs+1), desc="Finetuning"):
+        for epoch in tqdm(range(2586, 2586 + num_epochs + 1), desc="Finetuning"):
             # Training
             model.train()
             total_loss = 0
@@ -343,7 +343,7 @@ def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=3
                     f"Epoch: {epoch:03d}, LR: {lr:.7f}, Loss: {avg_loss:.7f}, Validation MAE: {val_error:.7f}"
                 )
             if epoch <= NUM_EPOCHS:
-                save_model(model, args, f"/workspace/output/final_fine/{dataset_name}/{MODEL}/{args.target}", args.target, epoch)
+                save_model(model, args, f"/workspace/output/re-retrain/{dataset_name}/{MODEL}/{args.target}", args.target, epoch)
 
         return model
 
@@ -459,6 +459,13 @@ def dataset_load_time():
                     with open(f"/workspace/output/load_time.json", "w") as f:
                         json.dump(res, f, indent=2)
 
-
+def retrain_more():
+    model_path = "/workspace/output/re-retrain/Set_1/ESC-GNN/11"
+    model, args = load_model_from_checkpoint(model_path, 2586)
+    train_dataset = load_dataset(args, "Set_1", split="train")
+    val_dataset = load_dataset(args, "Set_1", split="val")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=(1000-586), dataset_name="Set_1")
+    save_model(model, args, "/workspace/output/re-retrain/Set_1/ESC-GNN", args.target, epoch=3000)
 if __name__ == "__main__":
-    dataset_load_time()
+    retrain_more()
