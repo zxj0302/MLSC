@@ -12,45 +12,45 @@ The BEACON-Sampler is a versatile tool for extracting graphs from a database bas
 
 ## 3. Project Structure
 
-MLSC/
-├─ input/ (sample datasets are created and split in run.py,
-│ │ where each Set_i is a different dataset)
-│ ├─ rwd.db (oracle dataset)
-│ ├─ Set_1/
-│ │ ├─ config.json (configuration file for sampling)
-│ │ └─ dataset.pt (dict or list containing train, val, and test splits)
-│ ├─ Set_2/
-│ └─ Set_3/
-│
-├─ output/
-│ ├─ Set_1/
-│ │ ├─ DeSCo/
-│ │ │ ├─ pretrained/
-│ │ │ │ ├─ log.txt (e.g., includes time, command used)
-│ │ │ │ ├─ prediction_graph.csv
-│ │ │ │ └─ prediction_node.csv
-│ │ │ ├─ fine-tuning/
-│ │ │ └─ fine-tuned/
-│ │ ├─ ESC-GNN/
-│ │ │ ├─ params_1/
-│ │ │ │ ├─ log.txt (must have time for each part and hyper-parameters)
-│ │ │ │ ├─ prediction_graph.csv
-│ │ │ │ └─ prediction_node.csv
-│ │ │ ├─ params_2/
-│ │ ├─ EVOKE/
-│ │ └─ MOTIVO/
-│ └─ Set_2/
-│
-├─ plots/
-│
-├─ code/
-│ ├─ DeSCo/ (contains a script that reads in sampled dataset from MLSC/input and outputs
-│ │ the needed files to MLSC/output)
-│ ├─ ESC-GNN/
-│ └─ ESCAPE/
-│
-├─ config.json (configuration for run.py)
-└─ run.py
+# MLSC Directory Structure
+
+### MLSC/
+- **input/** *(sample datasets are created and split in run.py, where each Set_i is a different dataset)*
+  - `rwd.db` *(oracle dataset)*
+  - **Set_1/**
+    - `config.json` *(configuration file for sampling)*
+    - `dataset.pt` *(dict or list containing train, val, and test splits)*
+  - **Set_2/**
+  - **Set_3/**
+
+- **output/**
+  - **Set_1/**
+    - **DeSCo/**
+      - **pretrained/**
+        - `log.txt` *(e.g., includes time, command used)*
+        - `prediction_graph.csv`
+        - `prediction_node.csv`
+      - **fine-tuning/**
+      - **fine-tuned/**
+    - **ESC-GNN/**
+      - **params_1/**
+        - `log.txt` *(must have time for each part and hyper-parameters)*
+        - `prediction_graph.csv`
+        - `prediction_node.csv`
+      - **params_2/**
+    - **EVOKE/**
+    - **MOTIVO/**
+  - **Set_2/**
+
+- **plots/**
+
+- **code/**
+  - **DeSCo/** *(contains a script that reads in sampled dataset from MLSC/input and outputs the needed files to MLSC/output)*
+  - **ESC-GNN/**
+  - **ESCAPE/**
+
+- `config.json` *(configuration for run.py)*
+- `run.py`
 
 ### Detailed Notes
 
