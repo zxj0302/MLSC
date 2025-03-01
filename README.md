@@ -12,9 +12,9 @@ The BEACON-Sampler is a versatile tool for extracting graphs from a database bas
 
 ## 3. Project Structure
 
-# MLSC Directory Structure
+### MLSC Directory Structure
 
-### MLSC/
+**MLSC/**
 - **input/** *(sample datasets are created and split in run.py, where each Set_i is a different dataset)*
   - `rwd.db` *(oracle dataset)*
   - **Set_1/**
