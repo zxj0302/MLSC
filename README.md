@@ -1,4 +1,6 @@
 # MLSC Project Overview
+## 0. Website
+You can find more detailed information(including dataset, leaderboard, more experiment results, etc.) on our [website](https://momatinaj.github.io/beacon/dataset/).
 
 ## 1. BEACON-Oracle Dataset
 A key motivation for our Oracle Dataset is the absence of a large-scale dataset with ground truth subgraph counts in the community. To address this gap, we collected all graphs from the TUDataset alongside graphs from the OGB dataset, which encompasses a variety of domains such as bioinformatics, social networks, and computer vision. For each graph, we computed the ground truth counts for all subgraphs with up to five nodes, considering both local and global frequencies as well as induced and non-induced configurations.
