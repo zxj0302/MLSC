@@ -327,7 +327,7 @@ def loop(start=1, best_val_error=None):
     log = None
     count = 0
     timestamp = time.strftime("%Y%m%d%H%M%S")
-    folder = f"/workspace/output/runtime/{args.dataset}/{args.model}/Checkpoints/{args.target}/{timestamp}"
+    folder = f"/workspace/output/{args.dataset}/{args.model}/Checkpoints/{args.target}/{timestamp}"
     os.makedirs(folder, exist_ok=True)
     for epoch in pbar:
         pbar.set_description("Epoch: {:03d}".format(epoch))

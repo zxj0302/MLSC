@@ -1,4 +1,4 @@
-# Install script for directory: /workspace/MLSC-CodeLib/scope
+# Install script for directory: /workspace/code/scope
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -37,14 +37,19 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
   set(CMAKE_CROSSCOMPILING "FALSE")
 endif()
 
+# Set default install directory permissions.
+if(NOT DEFINED CMAKE_OBJDUMP)
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+endif()
+
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("/workspace/MLSC-CodeLib/scope/build/config/cmake_install.cmake")
-  include("/workspace/MLSC-CodeLib/scope/build/graph/cmake_install.cmake")
-  include("/workspace/MLSC-CodeLib/scope/build/utility/cmake_install.cmake")
-  include("/workspace/MLSC-CodeLib/scope/build/executable/cmake_install.cmake")
-  include("/workspace/MLSC-CodeLib/scope/build/plan/cmake_install.cmake")
-  include("/workspace/MLSC-CodeLib/scope/build/counting/cmake_install.cmake")
+  include("/workspace/code/scope/build/config/cmake_install.cmake")
+  include("/workspace/code/scope/build/graph/cmake_install.cmake")
+  include("/workspace/code/scope/build/utility/cmake_install.cmake")
+  include("/workspace/code/scope/build/executable/cmake_install.cmake")
+  include("/workspace/code/scope/build/plan/cmake_install.cmake")
+  include("/workspace/code/scope/build/counting/cmake_install.cmake")
 
 endif()
 
@@ -56,5 +61,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/workspace/MLSC-CodeLib/scope/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/workspace/code/scope/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

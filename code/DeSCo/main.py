@@ -49,6 +49,33 @@ class ZXJLogger:
 
 logger = ZXJLogger()
 
+import networkx as nx
+
+def create_star_graph(n):
+    if n <= 1:
+        # Edge case: single node or empty graph
+        G = nx.Graph()
+        if n == 1:
+            G.add_node(0)
+        return G
+    
+    if n <= 8:
+        atlas = nx.graph_atlas_g()
+        for graph in atlas:
+            if graph.number_of_nodes() == n:
+                # Check if it's a star graph
+                degrees = [graph.degree(node) for node in graph.nodes()]
+                if sorted(degrees) == [1] * (n-1) + [n-1]:
+                    return graph.copy()
+    G = nx.Graph()
+    
+    # Add nodes 0 through n-1
+    G.add_nodes_from(range(n))
+    G.add_edges_from([(0, i) for i in range(1, n)])
+    
+    return G
+
+
 def main(
     args_neighborhood,
     args_gossip,
@@ -645,7 +672,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # set the num_cpu to the cpu count
     # args.num_cpu = os.cpu_count()
-    args.num_cpu = 16
+    # args.num_cpu = 16
     print(args)
     args_neighborhood = argparse.Namespace()
     args_gossip = argparse.Namespace()
@@ -679,10 +706,17 @@ if __name__ == "__main__":
     gossip_checkpoint = args_opt.gossip_checkpoint
 
     # define the query graphs
-    query_ids = gen_query_ids(query_size=[3, 4, 5])[args_neighborhood.target: (args_neighborhood.target + 1)]
+    if args_neighborhood.target == -1:
+        query_ids = gen_query_ids(query_size=[3, 4, 5])
+        nx_queries = [nx.graph_atlas(i) for i in query_ids]
+    elif args_neighborhood.target <= 28:
+        query_ids = gen_query_ids(query_size=[3, 4, 5])[args_neighborhood.target: (args_neighborhood.target + 1)]
+        nx_queries = [nx.graph_atlas(i) for i in query_ids]
+    else:
+        nx_queries = [create_star_graph(args_neighborhood.target - 23)]
     # query_ids = [18, 29, 31, 37, 38]
     # query_ids = [6]
-    nx_queries = [nx.graph_atlas(i) for i in query_ids]
+    # nx_queries = [nx.graph_atlas(i) for i in query_ids]
     if args_neighborhood.use_node_feature:
         nx_queries_with_node_feat = []
         for query in nx_queries:

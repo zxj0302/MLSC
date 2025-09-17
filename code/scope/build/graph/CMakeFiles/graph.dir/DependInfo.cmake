@@ -1,33 +1,19 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
-  )
-# The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/workspace/MLSC-CodeLib/scope/graph/graph.cpp" "/workspace/MLSC-CodeLib/scope/build/graph/CMakeFiles/graph.dir/graph.cpp.o"
-  )
-set(CMAKE_CXX_COMPILER_ID "GNU")
-
-# Preprocessor definitions for this target.
-set(CMAKE_TARGET_DEFINITIONS_CXX
-  "graph_EXPORTS"
   )
 
-# The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "../config"
-  "../utility"
-  "../utility/automorphism"
-  "../graph"
-  "../plan"
-  "../counting"
-  "/root/.local/include"
-  "../graph/../utility/automorphism"
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/workspace/code/scope/graph/graph.cpp" "graph/CMakeFiles/graph.dir/graph.cpp.o" "gcc" "graph/CMakeFiles/graph.dir/graph.cpp.o.d"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "/workspace/MLSC-CodeLib/scope/build/utility/CMakeFiles/utility.dir/DependInfo.cmake"
+  "/workspace/code/scope/build/utility/CMakeFiles/utility.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

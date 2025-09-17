@@ -150,14 +150,12 @@ edgelist_path = f'data/{dataset_name}'
 num_file = len(os.listdir(edgelist_path))
 output_folder = sys.argv[2]
 os.makedirs('output_evoke', exist_ok=True)
+num_cpus = int(sys.argv[3]) if len(sys.argv) > 3 else 8
 
 def process_file(i):
     # Part 1: Execute the orbit counting command
     start = time.time()
-    if num_file == 1:
-        os.system(f'../exe/count_orbit_five {edgelist_path}/{i}.edges opnmp > /dev/null')
-    else:
-        os.system(f'../exe/count_orbit_five {edgelist_path}/{i}.edges > /dev/null')
+    os.system(f'../exe/count_orbit_five {edgelist_path}/{i}.edges > /dev/null')
     time_orbit = time.time() - start
 
     # Part 2: Read and process the output
@@ -194,7 +192,7 @@ def process_file(i):
 
 if __name__ == '__main__':
     start_whole = time.time()
-    with Pool(min(8, num_file)) as pool:
+    with Pool(min(num_cpus, num_file)) as pool:
         results = list(tqdm(pool.imap_unordered(process_file, range(num_file)), 
                             total=num_file, 
                             desc=dataset_name))

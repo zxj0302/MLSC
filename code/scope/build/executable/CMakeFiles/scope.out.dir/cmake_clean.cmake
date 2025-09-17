@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/scope.out.dir/scope.cpp.o"
+  "CMakeFiles/scope.out.dir/scope.cpp.o.d"
   "scope.out"
   "scope.out.pdb"
 )

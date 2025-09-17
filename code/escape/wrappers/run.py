@@ -67,6 +67,7 @@ matrices[5] = np.linalg.inv(matrices[5])
 
 dataset_name = sys.argv[1]
 output_folder = sys.argv[2]
+num_cpus = int(sys.argv[3]) if len(sys.argv) > 3 else 8
 
 def process_graph(input):
     output = f'output/{dataset_name}/'+ input.replace('.edges', '.txt')
@@ -115,7 +116,7 @@ if __name__ == '__main__':
         os.makedirs('output/' + dataset_name)
 
     # Determine the number of processes to use (you can adjust this)
-    num_processes = min(8, len(graphs))
+    num_processes = min(num_cpus, len(graphs))
 
     start_whole = time.time()
 

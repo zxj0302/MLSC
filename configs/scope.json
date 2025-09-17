@@ -1,0 +1,12 @@
+{
+    "input_path": "/workspace/input/",
+    "output_path": "/workspace/output/",
+    "num_cpus": 8,
+    "query": "/workspace/code/scope/exp/pattern_graph/5voc",
+    "results_path": "/workspace/code/scope/wrappers/output_scope",
+    "datasets": [
+        "Set_7"
+    ],
+    "preprocess": false,
+    "5voc": 1
+}

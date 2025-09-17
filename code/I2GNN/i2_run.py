@@ -7,37 +7,19 @@ import csv
 import logging
 import itertools
 import time
-import resource
-from typing import List, Tuple, Dict
+import sys
+from typing import List, Tuple, Dict, Optional
 from tqdm import tqdm
+import resource
 
-# Constants
-MODELS = ["PPGN"] # "PPGN", "GNN",, "PPGN" "IDGNN", , "GNNAK"
-ESCAPE_TARGET_DIAM = [2, 1,  2, 3, 2, 2, 2, 1,   2, 3, 4, 2, 3, 2, 3, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
-TARGET_DIAM =        [2, 1,  3, 2, 2, 2, 2, 1,   4, 3, 2, 3, 3, 2, 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
+# Hard-coded constants that should remain in the code
+ESCAPE_TARGET_DIAM = [2, 1, 2, 3, 2, 2, 2, 1, 2, 3, 4, 2, 3, 2, 3, 3, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
+TARGET_DIAM = [2, 1, 3, 2, 2, 2, 2, 1, 4, 3, 2, 3, 3, 2, 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
 
-# BATCH_SIZE = [16, 32, 128, 256]
-BATCH_SIZE = {
-    "GNN":[256, 256, 256, 256],
-    "PPGN":[1, 2, 2, 2],
-    "GNNAK":[2, 4, 4, 8],
-    "IDGNN":[2, 4, 4, 8],
-    "I2GNN":[1, 2, 4, 4]
-    }
-
-# Datasets
-DATASETS = ["Set_1"]
-
-# Configuration
-EXP_CONFIG = {
-    "h": [3],
-    "batch_size": [128],
-    "target": [11], # 7,10 list(range(29)), # [0, 1, 3, 10],
-    "model": MODELS,
-    "dataset": "data_esc", #[f"Set_{i}" for i in range(1, 2)],
-    "lr": [0.001],
-    "layers": [4],
-}
+def load_config(config_path: str) -> Dict:
+    """Load configuration from JSON file"""
+    with open(config_path, 'r') as f:
+        return json.load(f)
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -45,26 +27,28 @@ logger = logging.getLogger(__name__)
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run I2-GNN experiments")
-    parser.add_argument("input_folder", help="Path to the input folder containing dataset folders")
-    parser.add_argument("output_folder", help="Path to the output folder")
+    parser.add_argument("config", help="Path to configuration JSON file")
     return parser.parse_args()
 
-def generate_i2_commands(dataset: str) -> List[str]:
+def generate_i2_commands(dataset: str, config: Dict) -> List[str]:
     base_command = "python run_count.py"
-    config = EXP_CONFIG.copy()
-    config['dataset'] = [dataset]
+    exp_config = config["exp_config"].copy()
+    exp_config['dataset'] = [dataset]
     param_combinations = list(itertools.product(
-        config['batch_size'], config['target'], config['model'],
-        config['h'], config['lr'], config['layers'], config['dataset']
+        exp_config['batch_size'], exp_config['target'], [config["models"][0]],
+        exp_config['h'], exp_config['lr'], exp_config['layers'], exp_config['dataset']
     ))
 
+    batch_size_map = config["batch_size"]
+    epochs = config["training"]["epochs"]
+
     return [
-        f"{base_command} --batch_size {BATCH_SIZE[p[2]][-TARGET_DIAM[p[1]]]} --target {p[1]} --model {p[2]} "
-        f"--h {TARGET_DIAM[p[1]]} --lr {p[4]} --epoch 2000 --dataset {p[6]}"
+        f"{base_command} --batch_size {batch_size_map[p[2]][-TARGET_DIAM[p[1]]]} --target {p[1]} --model {p[2]} "
+        f"--h {TARGET_DIAM[p[1]]} --lr {p[4]} --epoch {epochs} --dataset {p[6]}"
         for p in param_combinations
     ]
 
-def execute_command(command: str) -> Tuple[float, float, int, int]:
+def execute_command(command: str) -> Tuple[float, float, int, int, str]:
     start_time = time.time()
     usage_start = resource.getrusage(resource.RUSAGE_CHILDREN)
     
@@ -78,15 +62,16 @@ def execute_command(command: str) -> Tuple[float, float, int, int]:
     cpu_time = usage_end.ru_utime - usage_start.ru_utime
     memory_usage = usage_end.ru_maxrss - usage_start.ru_maxrss
     
-    return execution_time, cpu_time, memory_usage, process.returncode, stderr
+    return execution_time, cpu_time, memory_usage, process.returncode, stderr.decode('utf-8')
 
-def run_i2_gnn(dataset: str, output_folder: str) -> None:
-    commands = generate_i2_commands(dataset)
+def run_i2_gnn(dataset: str, output_folder: str, config: Dict) -> None:
+    commands = generate_i2_commands(dataset, config)
     results = []
-    model_output_folder = os.path.join(output_folder, "retrain", dataset, EXP_CONFIG["model"][0])
+    model_output_folder = os.path.join(output_folder, "retrain", dataset, config["models"][0])
     os.makedirs(model_output_folder, exist_ok=True)
+    result_file = os.path.join(model_output_folder, f"{dataset}_results.json")
 
-    for cmd in tqdm(commands, desc=f"Running {EXP_CONFIG['model'][0]} on {dataset}", unit="command"):
+    for cmd in tqdm(commands, desc=f"Running {config['models'][0]} on {dataset}", unit="command"):
         execution_time, cpu_time, memory_usage, return_code, std_err = execute_command(cmd)
         
         results.append({
@@ -95,10 +80,9 @@ def run_i2_gnn(dataset: str, output_folder: str) -> None:
             "cpu_time": cpu_time,
             "memory_usage": memory_usage,
             "return_code": return_code,
-            "stderr": std_err.decode('utf-8')
+            "stderr": std_err
         })
 
-        result_file = os.path.join(model_output_folder, f"{dataset}_results.json")
         with open(result_file, 'w') as f:
             json.dump(results, f, indent=2)
 
@@ -153,22 +137,36 @@ def save_time_results(times: List[Dict[str, float]], output_folder: str) -> None
 
 def main() -> None:
     args = parse_arguments()
-    input_folder = args.input_folder
-    output_folder = args.output_folder
+    
+    # Load configuration from the provided file path
+    config = load_config(args.config)
+    
+    input_folder = config["paths"]["input_folder"]
+    output_folder = config["paths"]["output_folder"]
     
     os.makedirs(output_folder, exist_ok=True)
 
-    for dataset in DATASETS:
-        for model in MODELS:
-            EXP_CONFIG["model"] = [model]
-            run_i2_gnn(dataset, output_folder)
-
-            res_folder = os.path.join(output_folder, dataset, model)
-            dataset_file = os.path.join("/workspace/code/I2GNN/data", dataset, "raw/dataset_compatible.pt")
+    for dataset in config["datasets"]:
+        for model in config["models"]:
+            # Create a copy of exp_config and update the model
+            exp_config = config["exp_config"].copy()
+            
+            # Create a modified config for this iteration
+            modified_config = config.copy()
+            modified_config["exp_config"] = exp_config
+            modified_config["models"] = [model]
+            
             try:
-                parse_results(res_folder, dataset_file, os.path.join(output_folder, dataset, model))
+                run_i2_gnn(dataset, output_folder, modified_config)
+
+                res_folder = os.path.join(output_folder, dataset, model)
+                dataset_file = os.path.join(config["paths"]["dataset_base_path"], dataset, "raw/dataset_compatible.pt")
+                try:
+                    parse_results(res_folder, dataset_file, os.path.join(output_folder, dataset, model))
+                except Exception as e:
+                    logger.error(f"Error processing results for {dataset} with {model}: {e}")
             except Exception as e:
-                logger.error(f"Error processing results for {dataset} with {model}: {e}")
+                logger.error(f"Error running experiment for {dataset} with {model}: {e}")
 
 if __name__ == "__main__":
     main()

@@ -12,6 +12,7 @@ from count_models import GNN, PPGN, NGNN, GNNAK, IDGNN, I2GNN
 # Import dataset processing (you might need to adjust this import based on your project structure)
 import data_processing as dp
 from utils import create_subgraphs, create_subgraphs2
+from tqdm import tqdm
 
 
 def load_model_from_checkpoint(checkpoint_dir, cpt=100):
@@ -140,7 +141,7 @@ def test(loader, model, args, device, mean, std, output=False):
 
             y = data.y
             y_hat = model(data)[:, 0]
-            print(y.shape, y_hat.shape)
+            # print(y.shape, y_hat.shape)
             # Denormalize
             # y_hat = y_hat * std[args.target] + mean[args.target]
 
@@ -186,33 +187,34 @@ def run_test_on_dataset(model, args, dataset_name):
     return {"mae": mae, "gt_mean": gt_mean, "gt_std": gt_std, "pred_mean": pred_mean, "pred_std": pred_std, "predictions": y_pred, "ground_truth": y_true}
 
 
-def finetuned_on_all_datasets():
-    models = ["GNN", "GNNAK"]
-    TARGET = 13
-    datasets = ["Set_2", "Set_3", "Set_5"]
-    for m in models[-1:]:
-        for dataset in datasets[:2]:
-            # "/home/zxj/Dev/MLSC/output/final_fine/Set_2"
-            checkpoint_dir = f"/workspace/output/final_fine/{dataset}/{m}/{TARGET}"
-            print(f"Loading model from checkpoint: {checkpoint_dir}")
-            model, args = load_model_from_checkpoint(checkpoint_dir, cpt=300)
-            print(f"Model loaded: {type(model).__name__}")
+def finetuned_on_all_datasets(cpt):
+    models = ["IDGNN"]
+    TARGETS = [29, 30, 31]
+    datasets = ["Set_1"]
+    for m in models:
+        for dataset in datasets:
+            for TARGET in TARGETS:
+                # "/home/zxj/Dev/MLSC/output/final_fine/Set_2"
+                checkpoint_dir = f"/workspace/output/final_fine/{dataset}/{m}/{TARGET}"
+                print(f"Loading model from checkpoint: {checkpoint_dir}")
+                model, args = load_model_from_checkpoint(checkpoint_dir, cpt=cpt)
+                print(f"Model loaded: {type(model).__name__}")
 
-            test_dataset_name = dataset  # Replace with your actual test dataset name
-            print(f"Running test on dataset: {test_dataset_name}")
-            test_results = run_test_on_dataset(model, args, test_dataset_name)
+                test_dataset_name = dataset  # Replace with your actual test dataset name
+                print(f"Running test on dataset: {test_dataset_name}")
+                test_results = run_test_on_dataset(model, args, test_dataset_name)
 
-            print(f"Test Results:")
-            print(f"  MAE: {test_results['mae']}")
-            print(f"  Number of samples: {len(test_results['predictions'])}")
+                print(f"Test Results:")
+                print(f"  MAE: {test_results['mae']}")
+                print(f"  Number of samples: {len(test_results['predictions'])}")
 
-            # Optionally, save the results to a file
-            output_dir = f"output/fine/{test_dataset_name}/{m}/13"
-            os.makedirs(output_dir, exist_ok=True)
-            output_file = os.path.join(output_dir, f"{300}_cpt_test.json")
-            with open(output_file, "w") as f:
-                json.dump(test_results, f, indent=2)
-            print(f"Test results saved to: {output_file}")
+                # Optionally, save the results to a file
+                output_dir = f"output/fine/{test_dataset_name}/{m}/{TARGET}"
+                os.makedirs(output_dir, exist_ok=True)
+                output_file = os.path.join(output_dir, f"{cpt}_cpt_test.json")
+                with open(output_file, "w") as f:
+                    json.dump(test_results, f, indent=2)
+                print(f"Test results saved to: {output_file}")
 
 
 def main():
@@ -245,4 +247,5 @@ def main():
 
 
 if __name__ == "__main__":
-    finetuned_on_all_datasets()
+    for i in tqdm(range(1, 201)):
+        finetuned_on_all_datasets(i)

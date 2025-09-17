@@ -1,7 +1,10 @@
 file(REMOVE_RECURSE
   "CMakeFiles/plan.dir/cost_estimator.cpp.o"
+  "CMakeFiles/plan.dir/cost_estimator.cpp.o.d"
   "CMakeFiles/plan.dir/decompose.cpp.o"
+  "CMakeFiles/plan.dir/decompose.cpp.o.d"
   "CMakeFiles/plan.dir/tree.cpp.o"
+  "CMakeFiles/plan.dir/tree.cpp.o.d"
   "libplan.pdb"
   "libplan.so"
 )

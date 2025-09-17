@@ -21,17 +21,17 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-MODELS = ["GNN", "GNNAK"] # "GNN", "GNNAK", , "PPGN", "IDGNN"
-NUM_EPOCHS = 300
+MODELS = ["IDGNN"] # "GNN", "GNNAK", , "PPGN", "IDGNN""I2GNN", "GNNAK", "IDGNN", "PPGN"
+NUM_EPOCHS = 200
 NUM_TARGETS = 11
 BATCH_SIZE = {
     "GNN":[256, 256, 256, 256],
-    "PPGN":[1, 2, 2, 2],
+    "PPGN":[1, 1, 1, 1],
     "GNNAK":[2, 4, 4, 8],
     "IDGNN":[2, 4, 4, 8],
     "I2GNN":[1, 2, 4, 4]
     }
-TARGETS = [13]
+TARGETS = [29, 30, 31]
 
 
 def load_model_from_checkpoint(checkpoint_dir):
@@ -208,8 +208,8 @@ def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=2
                 logger.info(
                     f"Epoch: {epoch:03d}, LR: {lr:.7f}, Loss: {avg_loss:.7f}, Validation MAE: {val_error:.7f}"
                 )
-            if epoch <= NUM_EPOCHS:
-                save_model(model, args, f"/workspace/output/final_fine/{dataset_name}/{args.model}/{args.target}", args.target, epoch)
+            # if epoch <= NUM_EPOCHS:
+            save_model(model, args, f"/workspace/output/final_fine/{dataset_name}/{args.model}/{args.target}", args.target, epoch)
 
         return model
 
@@ -313,17 +313,16 @@ def main():
 
     for mod in MODELS:
         # if mod == "PPGN":
-        #     BATCH_SIZE = 4
         # else:
         #     BATCH_SIZE = 32
         base_checkpoint_dir = f"/workspace/output/data_esc/{mod}/Checkpoints"
-        for finetune_dataset_name in ["Set_2", "Set_3", "Set_5"]:
+        for finetune_dataset_name in ["Set_1"]:
             # finetune_dataset_name = "Set_1"  # Replace with your finetuning dataset name
             for target in TARGETS:  # Assuming 29 targets as in the original code
                 print(f"Processing target {target} with model {mod} on dataset {finetune_dataset_name}")
                 try:
                     target_checkpoint_dir = os.path.join(
-                        base_checkpoint_dir, str(target)
+                        base_checkpoint_dir, str(target if target < 29 else 10)
                     )
                     latest_timestamp = find_latest_timestamp_folder(
                         target_checkpoint_dir
@@ -369,7 +368,9 @@ def main():
                         val_dataset,
                         device,
                         num_epochs=NUM_EPOCHS,
-                        dataset_name=finetune_dataset_name,
+                        dataset_name=finetune_dataset_name
+
+        #     BATCH_SIZE = 4                        dataset_name=finetune_dataset_name,
                     )
 
                     # Save finetuned model
@@ -383,7 +384,7 @@ def main():
                     continue
 
 def dataset_load_time():
-    TARGET_DIAM = [2, 1,  3, 2, 2, 2, 2, 1,   4, 3, 2, 3, 3, 2, 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1]
+    TARGET_DIAM = [2, 1,  3, 2, 2, 2, 2, 1,   4, 3, 2, 3, 3, 2, 2, 3, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,  2, 2, 2]
     import time
     args_path = "/workspace/output/data_esc/GNN/Checkpoints/0/20241010212009/args.json"
     with open(args_path, "r") as f:
@@ -421,4 +422,5 @@ def dataset_load_time():
 
 
 if __name__ == "__main__":
-    dataset_load_time()
+    # dataset_load_time()
+    main()

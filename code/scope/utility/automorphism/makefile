@@ -3,7 +3,7 @@
 
 SHELL=/bin/bash
 CC=gcc
-CFLAGS= -O4  -mpopcnt -march=native -fPIC
+CFLAGS= -O4  -mpopcnt -march=native
 SAFECFLAGS= -O4
 LDFLAGS= 
 LOK=1         # 0 if no 64-bit integers

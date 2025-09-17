@@ -1,0 +1,27 @@
+{
+    "models": ["IDGNN"],
+    "batch_size": {
+        "GNN": [256, 256, 256, 256],
+        "PPGN": [1, 1, 1, 2],
+        "GNNAK": [2, 4, 4, 8],
+        "IDGNN": [2, 4, 4, 8],
+        "I2GNN": [1, 2, 4, 4]
+    },
+    "datasets": ["data_esc"],
+    "exp_config": {
+        "h": [2],
+        "batch_size": [128],
+        "target": [10],
+        "dataset": "data_esc",
+        "lr": [0.005],
+        "layers": [4]
+    },
+    "paths": {
+        "input_folder": "/workspace/input/",
+        "output_folder": "/workspace/output/",
+        "dataset_base_path": "/workspace/code/I2GNN/data"
+    },
+    "training": {
+        "epochs": 2000
+    }
+}

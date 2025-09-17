@@ -1,36 +1,22 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
 # The set of languages for which implicit dependencies are needed:
 set(CMAKE_DEPENDS_LANGUAGES
-  "CXX"
-  )
-# The set of files for implicit dependencies of each language:
-set(CMAKE_DEPENDS_CHECK_CXX
-  "/workspace/MLSC-CodeLib/scope/plan/cost_estimator.cpp" "/workspace/MLSC-CodeLib/scope/build/plan/CMakeFiles/plan.dir/cost_estimator.cpp.o"
-  "/workspace/MLSC-CodeLib/scope/plan/decompose.cpp" "/workspace/MLSC-CodeLib/scope/build/plan/CMakeFiles/plan.dir/decompose.cpp.o"
-  "/workspace/MLSC-CodeLib/scope/plan/tree.cpp" "/workspace/MLSC-CodeLib/scope/build/plan/CMakeFiles/plan.dir/tree.cpp.o"
-  )
-set(CMAKE_CXX_COMPILER_ID "GNU")
-
-# Preprocessor definitions for this target.
-set(CMAKE_TARGET_DEFINITIONS_CXX
-  "plan_EXPORTS"
   )
 
-# The include file search paths:
-set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "../config"
-  "../utility"
-  "../utility/automorphism"
-  "../graph"
-  "../plan"
-  "../counting"
-  "/root/.local/include"
-  "../plan/../utility/automorphism"
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/workspace/code/scope/plan/cost_estimator.cpp" "plan/CMakeFiles/plan.dir/cost_estimator.cpp.o" "gcc" "plan/CMakeFiles/plan.dir/cost_estimator.cpp.o.d"
+  "/workspace/code/scope/plan/decompose.cpp" "plan/CMakeFiles/plan.dir/decompose.cpp.o" "gcc" "plan/CMakeFiles/plan.dir/decompose.cpp.o.d"
+  "/workspace/code/scope/plan/tree.cpp" "plan/CMakeFiles/plan.dir/tree.cpp.o" "gcc" "plan/CMakeFiles/plan.dir/tree.cpp.o.d"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
-  "/workspace/MLSC-CodeLib/scope/build/graph/CMakeFiles/graph.dir/DependInfo.cmake"
-  "/workspace/MLSC-CodeLib/scope/build/utility/CMakeFiles/utility.dir/DependInfo.cmake"
+  "/workspace/code/scope/build/graph/CMakeFiles/graph.dir/DependInfo.cmake"
+  "/workspace/code/scope/build/utility/CMakeFiles/utility.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

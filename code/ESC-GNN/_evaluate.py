@@ -23,6 +23,7 @@ from utils_edge_efficient import create_subgraphs
 from sklearn.metrics import mean_absolute_error as MAE
 from modules.ppgn_modules import *
 import json
+from tqdm import tqdm
 
 
 
@@ -183,7 +184,7 @@ class NestedGIN_eff(torch.nn.Module):
         else:
             return x#, []
 
-def load_model_from_checkpoint(checkpoint_dir, cpt=100):
+def load_model_from_checkpoint(checkpoint_dir, cpt=200, eva=False):
     """
     Load a model from a checkpoint directory containing args.json and cpt_2000.pth.
     """
@@ -193,12 +194,13 @@ def load_model_from_checkpoint(checkpoint_dir, cpt=100):
     folder_names.sort()
     if len(folder_names) == 0:
         raise FileNotFoundError(f"No checkpoint folder found in {checkpoint_dir}")
-    checkpoint_dir = os.path.join(checkpoint_dir, folder_names[-1])
+    if not eva:
+        checkpoint_dir = os.path.join(checkpoint_dir, folder_names[-1])
     print(checkpoint_dir)
 
 
-    args_path = os.path.join(checkpoint_dir, "args.json")
-    checkpoint_path = os.path.join(checkpoint_dir, f"cpt_{cpt}.pth")
+    args_path = os.path.join(checkpoint_dir, "args.json" if not eva else "finetuned_args.json")
+    checkpoint_path = os.path.join(checkpoint_dir, f"cpt_{cpt}.pth" if not eva else f"finetuned_{cpt}.pth")
 
     if not os.path.exists(args_path):
         raise FileNotFoundError(
@@ -363,6 +365,35 @@ def zeroshot():
         print(f"Test results saved to: {output_file}")
 
 
+def finetuned_on_all_datasets(cpt):
+    models = ["ESC-GNN"]
+    TARGETS = [29, 30, 31]
+    datasets = ["Set_1"]
+    for m in models:
+        for dataset in datasets:
+            for TARGET in TARGETS:
+                # "/home/zxj/Dev/MLSC/output/final_fine/Set_2"
+                checkpoint_dir = f"/workspace/output/final_fine/{dataset}/{m}/{TARGET}"
+                print(f"Loading model from checkpoint: {checkpoint_dir}")
+                model, args = load_model_from_checkpoint(checkpoint_dir, cpt=cpt, eva=True)
+                print(f"Model loaded: {type(model).__name__}")
+
+                test_dataset_name = dataset  # Replace with your actual test dataset name
+                print(f"Running test on dataset: {test_dataset_name}")
+                test_results = run_test_on_dataset(model, args, test_dataset_name)
+
+                print(f"Test Results:")
+                print(f"  MAE: {test_results['mae']}")
+                print(f"  Number of samples: {len(test_results['predictions'])}")
+
+                # Optionally, save the results to a file
+                output_dir = f"output/fine/{test_dataset_name}/{m}/{TARGET}"
+                os.makedirs(output_dir, exist_ok=True)
+                output_file = os.path.join(output_dir, f"{cpt}_cpt_test.json")
+                with open(output_file, "w") as f:
+                    json.dump(test_results, f, indent=2)
+                print(f"Test results saved to: {output_file}")
+
 def main():
     MODEL = "ESC-GNN"
     TARGET = [13]
@@ -393,4 +424,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    for i in tqdm(range(1, 201)):
+        finetuned_on_all_datasets(i)

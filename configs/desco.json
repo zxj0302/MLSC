@@ -1,0 +1,23 @@
+{
+    "input_path": "/workspace/input/",
+    "output_path": "/workspace/output/",
+    "num_cpus": 8,
+    "datasets": [
+        "Set_1"
+    ],
+    "targets": [
+        30
+    ],
+    "diameters": [
+        2
+    ],
+    "run_mode": "finetune",
+    "params": {
+        "neigh_epoch_num": 30,
+        "gossip_epoch_num": 2,
+        "neigh_batch_size": 32,
+        "gossip_batch_size": 32,
+        "learning_rate": 0.001,
+        "weight_decay": 0.0001
+    }
+}

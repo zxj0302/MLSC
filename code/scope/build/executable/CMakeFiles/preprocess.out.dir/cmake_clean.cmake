@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/preprocess.out.dir/prepare.cpp.o"
+  "CMakeFiles/preprocess.out.dir/prepare.cpp.o.d"
   "preprocess.out"
   "preprocess.out.pdb"
 )

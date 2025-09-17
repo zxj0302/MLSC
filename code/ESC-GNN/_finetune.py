@@ -35,6 +35,8 @@ import json
 from dataloader import DataLoader
 
 import logging
+import datetime
+
 
 # Set up logging
 logging.basicConfig(
@@ -43,9 +45,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 MODEL = "ESC-GNN"
-NUM_EPOCHS = 3000
+NUM_EPOCHS = 200
 NUM_TARGETS = 29
-TARGETS = list(range(1,29))
+TARGETS = [29, 30, 31]
 
 class NestedGIN_eff(torch.nn.Module):
     def __init__(self, dataset, num_layers, hidden, use_z=False, use_rd=False, use_cycle=False, graph_pred=True,
@@ -204,16 +206,53 @@ class NestedGIN_eff(torch.nn.Module):
         else:
             return x#, []
 
+def find_latest_timestamp_folder(base_path):
+    try:
+        if not os.path.exists(base_path):
+            raise FileNotFoundError(f"The directory {base_path} does not exist.")
+
+        # List all subfolders in the given directory
+        subfolders = [
+            f
+            for f in os.listdir(base_path)
+            if os.path.isdir(os.path.join(base_path, f))
+        ]
+
+        # Filter and parse valid timestamp folders
+        valid_timestamps = []
+        for folder in subfolders:
+            try:
+                # Attempt to parse the folder name as a timestamp
+                timestamp = datetime.datetime.strptime(folder, "%Y%m%d%H%M%S")
+                valid_timestamps.append((timestamp, folder))
+            except ValueError:
+                # If parsing fails, it's not a valid timestamp folder, so we skip it
+                continue
+
+        if not valid_timestamps:
+            return None
+
+        # Sort the valid timestamps and return the name of the latest one
+        latest_timestamp = max(valid_timestamps, key=lambda x: x[0])
+        return latest_timestamp[1]
+
+    except Exception as e:
+        print(f"An error occurred while finding the latest timestamp folder: {str(e)}")
+        return None
+
 def load_model_from_checkpoint(checkpoint_dir, cpt=2000):
     try:
-        folder_names = os.listdir(checkpoint_dir)
-        folder_names.sort()
-        if len(folder_names) == 0:
-            raise FileNotFoundError(f"No checkpoint folder found in {checkpoint_dir}")
-        # checkpoint_dir = os.path.join(checkpoint_dir, folder_names[-1])
+        # folder_names = os.listdir(checkpoint_dir)
+        # folder_names.sort()
+        # if len(folder_names) == 0:
+        #     raise FileNotFoundError(f"No checkpoint folder found in {checkpoint_dir}")
+        # # checkpoint_dir = os.path.join(checkpoint_dir, folder_names[-1])
+        latest_cpt_dir = find_latest_timestamp_folder(checkpoint_dir)
+        checkpoint_dir = os.path.join(checkpoint_dir, str(latest_cpt_dir))
 
-        args_path = os.path.join(checkpoint_dir, "finetuned_args.json")
-        checkpoint_path = os.path.join(checkpoint_dir, f"finetuned_{cpt}.pth")
+
+        args_path = os.path.join(checkpoint_dir, "args.json")
+        checkpoint_path = os.path.join(checkpoint_dir, f"cpt_{cpt}.pth")
 
         if not os.path.exists(args_path):
             raise FileNotFoundError(f"args.json not found in the checkpoint directory: {args_path}")
@@ -287,7 +326,7 @@ def load_dataset(args, dataset_name, split="test"):
 
     return dataset
 
-def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=300, dataset_name="Set_1"):
+def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=200, dataset_name="Set_1"):
     """
     Finetune the model on the given dataset with validation.
     """
@@ -300,7 +339,7 @@ def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=3
             mode="min",
             factor=args.lr_decay_factor,
             patience=args.patience,
-            min_lr=0.00001,
+            min_lr=0.001,
         )
         print(f"Finetuning model on dataset {dataset_name} for target {args.target}")
         train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
@@ -308,7 +347,7 @@ def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=3
         print(f"Train size: {len(train_dataset)}, Val size: {len(val_dataset)}")
 
         best_val_error = None
-        for epoch in tqdm(range(2586, 2586 + num_epochs + 1), desc="Finetuning"):
+        for epoch in tqdm(range(1, num_epochs + 1), desc="Finetuning"):
             # Training
             model.train()
             total_loss = 0
@@ -342,8 +381,8 @@ def finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=3
                 logger.info(
                     f"Epoch: {epoch:03d}, LR: {lr:.7f}, Loss: {avg_loss:.7f}, Validation MAE: {val_error:.7f}"
                 )
-            if epoch <= NUM_EPOCHS:
-                save_model(model, args, f"/workspace/output/re-retrain/{dataset_name}/{MODEL}/{args.target}", args.target, epoch)
+            if epoch == NUM_EPOCHS:
+                save_model(model, args, f"/workspace/output/final_fine/{dataset_name}/{MODEL}/{args.target}", args.target, epoch)
 
         return model
 
@@ -394,7 +433,7 @@ def main():
     for finetune_dataset_name in ["Set_1"]:
         for target in TARGETS:
             try:
-                checkpoint_dir = os.path.join(base_checkpoint_dir, str(target))
+                checkpoint_dir = os.path.join(base_checkpoint_dir, str(target if target < 29 else 10))
                 
                 # Load model and args
                 model, args = load_model_from_checkpoint(checkpoint_dir)
@@ -468,4 +507,5 @@ def retrain_more():
     model = finetune_model(model, args, train_dataset, val_dataset, device, num_epochs=(1000-586), dataset_name="Set_1")
     save_model(model, args, "/workspace/output/re-retrain/Set_1/ESC-GNN", args.target, epoch=3000)
 if __name__ == "__main__":
-    retrain_more()
+    # retrain_more()
+    main()

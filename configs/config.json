@@ -1,0 +1,263 @@
+{
+    "sample_config": {
+        "db_path": "input/rwd.db",
+        "save_path": null,
+        "output_folder": "input",
+        "datasets": {
+            "Set_1": {
+                "constraints": {
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"max": 1.5},
+                    "degree_max": {"max": 100},
+                    "random_seed": 0,
+                    "limit": 1200
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
+            },
+            "Set_2": {
+                "constraints": {
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"max": 1.5},
+                    "random_seed": 0,
+                    "limit": 1200
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
+            },
+            "Set_3": {
+                "constraints": {
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"min": 1.5, "max": 5},
+                    "degree_max": {"max": 100},
+                    "random_seed": 0,
+                    "limit": 1200
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
+            },
+            "Set_4": {
+                "constraints": {
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"min": 1.5, "max": 5},
+                    "random_seed": 0,
+                    "limit": 1200
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
+            },
+            "Set_5": {
+                "constraints": {
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"min": 5, "max": 10},
+                    "degree_max": {"max": 100},
+                    "random_seed": 0,
+                    "limit": 1200
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
+            },
+            "Set_6": {
+                "constraints": {
+                    "num_nodes": {"min": 0, "max": 500},
+                    "degree_avg": {"min": 5, "max": 10},
+                    "random_seed": 0,
+                    "limit": 1200
+                },
+                "split_ratio": "4:1:1",
+                "merge_test": false
+            },
+            "Set_7": {
+                "constraints": {
+                    "num_nodes": {"min": 100, "max": 5000},
+                    "random_seed": 0,
+                    "limit": 200
+                },
+                "split_ratio": "4:1:4",
+                "merge_test": true
+            },
+            "Set_8": {
+                "constraints": {
+                    "num_nodes": {"min": 100, "max": 5000},
+                    "random_seed": 0,
+                    "limit": 500
+                },
+                "split_ratio": "4:1:4",
+                "merge_test": true
+            },
+            "Set_9": {
+                "constraints": {
+                    "num_nodes": {"min": 100, "max": 5000},
+                    "random_seed": 0,
+                    "limit": 1000
+                },
+                "split_ratio": "4:1:4",
+                "merge_test": true
+            },
+            "Set_10": {
+                "constraints": {
+                    "num_nodes": {"min": 100, "max": 5000},
+                    "random_seed": 0,
+                    "limit": 2000
+                },
+                "split_ratio": "4:1:4",
+                "merge_test": true
+            }
+        }
+    },
+    "plot_config": {
+        "root_folder": "plots",
+        "sample_path": "input",
+        "prediction_path": "output"
+    },
+    "algorithms": [
+        {
+            "name": "ESCAPE",
+            "skip": true,
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:BASIC",
+                "name": "ESCAPE_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "C:/Users/27491/Desktop/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15"
+            },
+            "command": [
+                "docker", "exec", "-it", "ESCAPE_EXP", "bash", "-ilc", "cd /workspace/code/escape && python escape_run.py /workspace/configs/evoke.json"
+            ]
+        },
+        {
+            "name": "SCOPE",
+            "skip": false,
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:BASIC",
+                "name": "SCOPE_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "C:/Users/27491/Desktop/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15"
+            },
+            "command": [
+                "docker", "exec", "-it", "SCOPE_EXP", "bash", "-ilc", "cd /workspace/code/scope && python scope_run.py /workspace/configs/scope.json"
+            ]
+        },
+        {
+            "name": "EVOKE",
+            "skip": true,
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:BASIC",
+                "name": "EVOKE_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "C:/Users/27491/Desktop/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15"
+            },
+            "command": [
+                "docker", "exec", "-it", "EVOKE_EXP", "bash", "-ilc", "cd /workspace/code/evoke && python evoke_run.py /workspace/configs/evoke.json"
+            ]
+        },
+        {
+            "name": "MOTIVO",
+            "skip": true,
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:MOTIVO",
+                "name": "MOTIVO_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "C:/Users/27491/Desktop/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15"
+            },
+            "command": [
+                "docker", "exec", "-it", "MOTIVO_EXP", "bash", "-ilc", "cd /workspace/code/motivo && python motivo_run.py /workspace/configs/motivo.json"
+            ]
+        },
+        {
+            "name": "DeSCo",
+            "skip": true,
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:DeSCo_WSL",
+                "name": "DeSCo_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "C:/Users/27491/Desktop/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15",
+                "device_requests": [{"Driver": "", "DeviceIDs": ["0"], "Capabilities": [["gpu"]], "Options": null}]
+            },
+            "command": [
+                "docker", "exec", "-it", "DeSCo_EXP", "bash", "-ilc", "cd /workspace/code/DeSCo && conda activate DeSCo && python desco_run.py /workspace/configs/desco.json"
+            ]
+        },
+        {
+            "name": "ESC-GNN",
+            "skip": true,
+            "container_config": {
+                "image": "zhuxiangju/benchmark_subgraphcounting:ESC-GNN_WSL",
+                "name": "ESC_EXP",
+                "detach": true,
+                "tty": true,
+                "stdin_open": true,
+                "volumes": {
+                    "C:/Users/27491/Desktop/MLSC": {"bind": "/workspace", "mode": "rw"}
+                },
+                "ipc_mode": "host",
+                "cpuset_cpus": "0-15",
+                "device_requests": [{"Driver": "", "DeviceIDs": ["0"], "Capabilities": [["gpu"]], "Options": null}]
+            },
+            "command": [
+                "docker", "exec", "-it", "ESC_EXP", "bash", "-ilc", "cd /workspace/code/ESC-GNN && conda activate ESC-GNN && python _evaluate.py"
+            ]
+            
+        },
+        {
+            "name": "I2GNN",
+            "skip": true,
+            "container_config":{
+                    "image": "zhuxiangju/benchmark_subgraphcounting:ESC-GNN_WSL",
+                    "name": "I2GNN_EXP",
+                    "detach": true,
+                    "tty": true,
+                    "stdin_open": true,
+                    "volumes": {
+                        "C:/Users/27491/Desktop/MLSC": {"bind": "/workspace", "mode": "rw"}
+                    },
+                    "ipc_mode": "host",
+                    "cpuset_cpus": "0-15",
+                    "device_requests": [{"Driver": "", "DeviceIDs": ["0"], "Capabilities": [["gpu"]], "Options": null}]
+                },
+                "command": [
+                    "docker", "exec", "-it", "I2GNN_EXP", "bash", "-ilc", "cd /workspace/code/I2GNN && conda activate ESC-GNN && python _evaluate.py"
+                ]
+        },
+        {
+            "name": "LPP",
+            "skip": true,
+            "i2_run.py /workspace/configs/i2gnn.json": {}
+        }
+    ],
+    "execution_control": {
+    "sample_oracle": false,
+    "plot_sampled": false,
+    "run_experiments": true,
+    "plot_results": false
+    }    
+}

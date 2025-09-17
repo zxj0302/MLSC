@@ -1,0 +1,8 @@
+{
+    "input_path": "/workspace/input/",
+    "output_path": "/workspace/output/",
+    "num_cpus": 8,
+    "datasets": [
+        "Set_1"
+    ]
+}

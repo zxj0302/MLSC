@@ -332,6 +332,6 @@ def main(config_path, **kwargs):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Script for running experiments")
-    parser.add_argument("--config", default="config.json", help="Path to the configuration file")
+    parser.add_argument("--config", default="configs/config.json", help="Path to the configuration file")
     args = parser.parse_args()
     main(args.config)

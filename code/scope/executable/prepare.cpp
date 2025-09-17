@@ -137,16 +137,45 @@ void reorderAndStore(const DataGraph &g, const std::string &graphPath, const std
 
 int main(int argc, char** argv) {
     DataGraph g = DataGraph();
-    if (argc < 3) {
-        std::cout << "<raw graph path> <graph output path> <triangle output path>" << std::endl;
+    if (argc < 5) {
+        std::cout << "Usage: <raw graph path> <graph output path> <triangle output path> <mapping output path>" << std::endl;
         exit(1);
     }
     std::string input_file_path(argv[1]);
     std::string output_file_path(argv[2]);
     std::string triangle_file_path(argv[3]);
+    std::string mapping_file_path(argv[4]);
+    
     g.loadDataGraph(input_file_path);
     VertexID *old2new = coreDecompOrdering(g, output_file_path);
+    
+    // Save the old2new mapping
+    VertexID n = g.getNumVertices();
+    std::ofstream mapping_out(mapping_file_path);
+    mapping_out << "Old_ID\tNew_ID\n";
+    for (VertexID oldId = 0; oldId < n; ++oldId) {
+        mapping_out << oldId << "\t" << old2new[oldId] << "\n";
+    }
+    mapping_out.close();
+    std::cout << "Vertex mapping saved to: " << mapping_file_path << std::endl;
+    
     reorderAndStore(g, output_file_path, triangle_file_path, old2new);
     delete[] old2new;
     return 0;
 }
+
+// int main(int argc, char** argv) {
+//     DataGraph g = DataGraph();
+//     if (argc < 3) {
+//         std::cout << "<raw graph path> <graph output path> <triangle output path>" << std::endl;
+//         exit(1);
+//     }
+//     std::string input_file_path(argv[1]);
+//     std::string output_file_path(argv[2]);
+//     std::string triangle_file_path(argv[3]);
+//     g.loadDataGraph(input_file_path);
+//     VertexID *old2new = coreDecompOrdering(g, output_file_path);
+//     reorderAndStore(g, output_file_path, triangle_file_path, old2new);
+//     delete[] old2new;
+//     return 0;
+// }

@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/batch.out.dir/batch.cpp.o"
+  "CMakeFiles/batch.out.dir/batch.cpp.o.d"
   "batch.out"
   "batch.out.pdb"
 )
